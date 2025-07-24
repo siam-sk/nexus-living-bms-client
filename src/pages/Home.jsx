@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import reactLogo from '../assets/react.svg'
 import viteLogo from '/vite.svg'
 
-function App() {
+function Home() {
   const [count, setCount] = useState(0)
 
   return (
@@ -21,7 +21,7 @@ function App() {
           count is {count}
         </button>
         <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
+          Edit <code>src/pages/Home.jsx</code> and save to test HMR
         </p>
       </div>
       <p className="read-the-docs">
@@ -31,4 +31,4 @@ function App() {
   )
 }
 
-export default App
+export default Home;
