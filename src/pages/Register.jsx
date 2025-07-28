@@ -1,26 +1,51 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { AuthContext } from '../contexts/AuthProvider';
+import toast from 'react-hot-toast';
 
 const Register = () => {
-  const { createUser } = useContext(AuthContext);
+  const { createUser, updateUserProfile } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [passwordError, setPasswordError] = useState('');
 
   const handleRegister = (event) => {
     event.preventDefault();
+    setPasswordError('');
     const form = event.target;
     const name = form.name.value;
+    const photoURL = form.photoURL.value;
     const email = form.email.value;
     const password = form.password.value;
 
+    // Password validation
+    if (password.length < 6) {
+      setPasswordError('Password must be at least 6 characters long.');
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      setPasswordError('Password must contain at least one uppercase letter.');
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      setPasswordError('Password must contain at least one lowercase letter.');
+      return;
+    }
+
+    const toastId = toast.loading('Creating your account...');
+
     createUser(email, password)
-      .then((result) => {
-        
-        console.log(result.user);
-        navigate('/');
+      .then(() => {
+        updateUserProfile(name, photoURL)
+          .then(() => {
+            toast.success('Account created successfully!', { id: toastId });
+            navigate('/');
+          })
+          .catch((error) => {
+            toast.error(error.message, { id: toastId });
+          });
       })
       .catch((error) => {
-        console.error(error);
+        toast.error(error.message, { id: toastId });
       });
   };
 
@@ -37,6 +62,18 @@ const Register = () => {
               type="text"
               name="name"
               placeholder="Your Name"
+              className="input input-bordered"
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label">
+              <span className="label-text">Photo URL</span>
+            </label>
+            <input
+              type="text"
+              name="photoURL"
+              placeholder="Your Photo URL"
               className="input input-bordered"
               required
             />
@@ -64,6 +101,13 @@ const Register = () => {
               className="input input-bordered"
               required
             />
+            {passwordError && (
+              <label className="label">
+                <span className="label-text-alt text-error">
+                  {passwordError}
+                </span>
+              </label>
+            )}
           </div>
           <div className="form-control mt-6">
             <button type="submit" className="btn btn-primary">

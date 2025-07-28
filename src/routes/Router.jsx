@@ -3,6 +3,7 @@ import Root from "../layouts/Root";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import Apartment from "../pages/Apartment";
 
 export const router = createBrowserRouter([
     {
@@ -12,6 +13,10 @@ export const router = createBrowserRouter([
             {
                 index: true,
                 element: <Home />
+            },
+            {
+                path: 'apartment',
+                element: <Apartment />
             },
             {
                 path: 'login',

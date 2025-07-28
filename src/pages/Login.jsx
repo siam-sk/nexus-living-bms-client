@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
 import { AuthContext } from '../contexts/AuthProvider';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const { signIn, googleSignIn } = useContext(AuthContext);
@@ -13,22 +14,26 @@ const Login = () => {
     const form = event.target;
     const email = form.email.value;
     const password = form.password.value;
+    const toastId = toast.loading('Logging in...');
 
     signIn(email, password)
       .then(() => {
+        toast.success('Logged in successfully!', { id: toastId });
         navigate(from, { replace: true });
       })
       .catch((error) => {
-        console.error(error);
+        toast.error(error.message, { id: toastId });
       });
   };
 
   const handleGoogleSignIn = () => {
+    const toastId = toast.loading('Signing in with Google...');
     googleSignIn()
       .then(() => {
+        toast.success('Logged in successfully!', { id: toastId });
         navigate(from, { replace: true });
       })
-      .catch((error) => console.error(error));
+      .catch((error) => toast.error(error.message, { id: toastId }));
   };
 
   return (
