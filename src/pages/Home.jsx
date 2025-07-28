@@ -76,6 +76,7 @@ function Home() {
     <div>
       <Banner />
       <div className="container mx-auto px-4 py-12">
+        {/* Welcome Section */}
         <section className="text-center">
           <h2 className="text-4xl font-bold mb-4">Welcome to Nexus Living</h2>
           <p className="text-lg text-base-content max-w-3xl mx-auto">
@@ -83,6 +84,47 @@ function Home() {
             apartments offer breathtaking views, modern designs, and a vibrant
             community. Your new home awaits.
           </p>
+        </section>
+
+        {/* About the Building Section */}
+        <section className="mt-16 bg-gray-100 p-8 rounded-lg shadow-lg">
+          <div className="text-center mb-8">
+            <h2 className="text-4xl font-bold text-primary mb-4">
+              About the Building
+            </h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Nexus Living is a modern residential complex designed to provide
+              unparalleled comfort and luxury. With state-of-the-art amenities,
+              eco-friendly architecture, and a vibrant community, it’s more than
+              just a place to live—it’s a lifestyle.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="Modern Architecture"
+                className="w-full h-64 object-cover rounded-lg shadow-md"
+              />
+              <h3 className="text-2xl font-semibold mt-4">Modern Architecture</h3>
+              <p className="text-gray-600 mt-2">
+                Designed with sleek, contemporary lines and eco-friendly materials,
+                our building stands as a beacon of modern living.
+              </p>
+            </div>
+            <div className="flex flex-col items-center text-center">
+              <img
+                src="https://images.pexels.com/photos/259950/pexels-photo-259950.jpeg?auto=compress&cs=tinysrgb&w=600"
+                alt="Luxury Amenities"
+                className="w-full h-64 object-cover rounded-lg shadow-md"
+              />
+              <h3 className="text-2xl font-semibold mt-4">Luxury Amenities</h3>
+              <p className="text-gray-600 mt-2">
+                Enjoy access to a rooftop pool, fitness center, co-working spaces,
+                and more, all designed to enhance your lifestyle.
+              </p>
+            </div>
+          </div>
         </section>
       </div>
     </div>
