@@ -85,14 +85,31 @@ const Apartment = () => {
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
+  const [appliedQuery, setAppliedQuery] = useState({ min: '', max: '' });
+  const [selectedRange, setSelectedRange] = useState('');
   const itemsPerPage = 6;
+
+  const rentRanges = [
+    { label: 'All Prices', value: '' },
+    { label: '$0 - $1250', value: '0-1250' },
+    { label: '$1251 - $1500', value: '1251-1500' },
+    { label: '$1501+', value: '1501-999999' },
+  ];
 
   const numberOfPages = Math.ceil(count / itemsPerPage);
   const pages = [...Array(numberOfPages).keys()];
 
   useEffect(() => {
     setLoading(true);
-    fetch(`http://localhost:5000/apartments?page=${currentPage}&size=${itemsPerPage}`)
+    let url = `http://localhost:5000/apartments?page=${currentPage}&size=${itemsPerPage}`;
+    if (appliedQuery.min) {
+      url += `&minRent=${appliedQuery.min}`;
+    }
+    if (appliedQuery.max) {
+      url += `&maxRent=${appliedQuery.max}`;
+    }
+
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setApartments(data.apartments);
@@ -103,7 +120,20 @@ const Apartment = () => {
         console.error('Failed to fetch apartments:', error);
         setLoading(false);
       });
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage, appliedQuery]);
+
+  const handleFilterChange = (e) => {
+    const currentSelectedRange = e.target.value;
+    setSelectedRange(currentSelectedRange);
+
+    if (currentSelectedRange) {
+      const [min, max] = currentSelectedRange.split('-');
+      setAppliedQuery({ min, max });
+    } else {
+      setAppliedQuery({ min: '', max: '' });
+    }
+    setCurrentPage(0); 
+  };
 
   if (loading) {
     return (
@@ -124,6 +154,27 @@ const Apartment = () => {
           one that fits your lifestyle.
         </p>
       </div>
+
+      {/* Search Section */}
+      <div className="mb-12 p-6 bg-base-200 rounded-lg shadow-md">
+        <div className="flex items-center justify-center gap-4">
+          <h3 className="text-xl font-semibold">Filter by Rent:</h3>
+          <div className="form-control">
+            <select
+              onChange={handleFilterChange}
+              className="select select-bordered w-full max-w-xs"
+              value={selectedRange}
+            >
+              {rentRanges.map((range) => (
+                <option key={range.label} value={range.value}>
+                  {range.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {apartments.map((apartment) => (
           <ApartmentCard key={apartment._id} apartment={apartment} />
