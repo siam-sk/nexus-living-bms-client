@@ -1,7 +1,55 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router';
+import { AuthContext } from '../contexts/AuthProvider';
+import toast from 'react-hot-toast';
 
 const ApartmentCard = ({ apartment }) => {
   const { image, floor_no, block_name, apartment_no, rent } = apartment;
+  const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleAgreement = () => {
+    if (user && user.email) {
+      const toastId = toast.loading('Submitting your request...');
+
+      const agreementData = {
+        user_name: user.displayName,
+        user_email: user.email,
+        floor_no,
+        block_name,
+        apartment_no,
+        rent,
+        status: 'pending',
+      };
+
+      fetch('http://localhost:5000/agreements', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(agreementData),
+      })
+        .then(res => {
+          if (!res.ok) {
+            return res.json().then(err => { throw new Error(err.message) });
+          }
+          return res.json();
+        })
+        .then(data => {
+          if (data.insertedId) {
+            toast.success('Agreement request submitted successfully!', { id: toastId });
+          }
+        })
+        .catch(error => {
+          toast.error(error.message || 'Failed to submit request.', { id: toastId });
+        });
+    } else {
+      toast.error('You must be logged in to make an agreement.');
+      navigate('/login', { state: { from: location }, replace: true });
+    }
+  };
+
   return (
     <div className="card bg-base-100 shadow-xl transition-transform transform hover:-translate-y-2">
       <figure>
@@ -25,7 +73,7 @@ const ApartmentCard = ({ apartment }) => {
         </div>
         <p className="text-xl font-bold text-primary">Rent: ${rent}/month</p>
         <div className="card-actions justify-end mt-4">
-          <button className="btn btn-primary">Agreement</button>
+          <button onClick={handleAgreement} className="btn btn-primary">Agreement</button>
         </div>
       </div>
     </div>
