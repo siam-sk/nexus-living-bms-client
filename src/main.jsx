@@ -4,9 +4,12 @@ import './index.css'
 import { RouterProvider } from 'react-router'
 import { router } from './routes/Router'
 import 'leaflet/dist/leaflet.css';
+import AuthProvider from './contexts/AuthProvider';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 )

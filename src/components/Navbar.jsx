@@ -1,8 +1,14 @@
+import { useContext } from 'react';
 import { Link, NavLink } from "react-router";
+import { AuthContext } from '../contexts/AuthProvider';
 
 const Navbar = () => {
     
-    const user = null;
+    const { user, logOut } = useContext(AuthContext);
+
+    const handleLogout = () => {
+        logOut().catch(err => console.error(err));
+    }
 
     const navLinks = (
         <>
@@ -57,13 +63,13 @@ const Navbar = () => {
                     <div className="dropdown dropdown-end">
                         <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                             <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                                <img alt="User Profile" src={user.photoURL} />
+                                <img alt="User Profile" src={user.photoURL || 'https://i.ibb.co/1zShS2c/default-avatar-icon-of-social-media-user-vector.jpg'} />
                             </div>
                         </label>
                         <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                            <li className="p-2 font-semibold">{user.name}</li>
+                            <li className="p-2 font-semibold">{user.displayName || 'User'}</li>
                             <li><Link to="/dashboard">Dashboard</Link></li>
-                            <li><button>Logout</button></li>
+                            <li><button onClick={handleLogout}>Logout</button></li>
                         </ul>
                     </div>
                 ) : (
