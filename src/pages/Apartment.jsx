@@ -83,19 +83,27 @@ const ApartmentCard = ({ apartment }) => {
 const Apartment = () => {
   const [apartments, setApartments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [count, setCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 6;
+
+  const numberOfPages = Math.ceil(count / itemsPerPage);
+  const pages = [...Array(numberOfPages).keys()];
 
   useEffect(() => {
-    fetch('http://localhost:5000/apartments')
+    setLoading(true);
+    fetch(`http://localhost:5000/apartments?page=${currentPage}&size=${itemsPerPage}`)
       .then((res) => res.json())
       .then((data) => {
-        setApartments(data);
+        setApartments(data.apartments);
+        setCount(data.count);
         setLoading(false);
       })
       .catch((error) => {
         console.error('Failed to fetch apartments:', error);
         setLoading(false);
       });
-  }, []);
+  }, [currentPage, itemsPerPage]);
 
   if (loading) {
     return (
@@ -120,6 +128,21 @@ const Apartment = () => {
         {apartments.map((apartment) => (
           <ApartmentCard key={apartment._id} apartment={apartment} />
         ))}
+      </div>
+
+      {/* Pagination Controls */}
+      <div className="text-center mt-12">
+        <div className="join">
+          {pages.map((pageNumber) => (
+            <button
+              key={pageNumber}
+              onClick={() => setCurrentPage(pageNumber)}
+              className={`join-item btn ${currentPage === pageNumber ? 'btn-primary' : ''}`}
+            >
+              {pageNumber + 1}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
