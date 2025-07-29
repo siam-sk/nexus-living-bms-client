@@ -1,12 +1,115 @@
-# React + Vite
+# Nexus Living - Building Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Nexus Living is a full-stack web application designed to streamline the management of a residential building. It provides distinct dashboard experiences for residents, members (tenants with agreements), and administrators, facilitating everything from apartment hunting to rent payments and community announcements.
 
-Currently, two official plugins are available:
+**Live URL:** [https://nexus-living.web.app](https://nexus-living.web.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**GitHub Repositories:**
+- **Client-Side:** [https://github.com/your-username/a12-bms-client](https://github.com/your-username/a12-bms-client)
+- **Server-Side:** [https://github.com/your-username/a12-bms-server](https://github.com/your-username/a12-bms-server)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Key Features
+
+- **Role-Based Access Control:**
+    - **Guests:** Can browse available apartments.
+    - **Users:** Registered users can request to rent an apartment by making an agreement.
+    - **Members:** Logged-in tenants with an active agreement can make payments, view payment history, and see announcements.
+    - **Admin:** Manages the entire system, including user roles, apartment listings, agreement requests, coupons, and announcements.
+
+- **Secure Authentication:**
+    - JWT-based authentication using Firebase for both email/password and Google social login.
+    - Secure middleware on the backend to protect routes based on user roles.
+
+- **Interactive Dashboards:**
+    - **Admin Dashboard:** Displays key statistics (room availability, user counts), and provides tools to manage members, handle agreement requests, create/manage coupons, and post announcements.
+    - **Member Dashboard:** Allows members to view their profile, make rent payments (with coupon support), and view their complete payment history.
+    - **User Dashboard:** A basic view for registered users to manage their profile and see announcements.
+
+- **Apartment & Agreement System:**
+    - Publicly viewable list of apartments with pagination.
+    - Users can submit an agreement request for an apartment.
+    - Admins can accept or reject agreement requests, which automatically updates the user's role and the room's availability.
+
+- **Payment & Coupon System:**
+    - Members can make monthly rent payments through a simulated payment gateway.
+    - A dynamic coupon system allows admins to create and manage discount coupons.
+    - Members can apply valid coupons at checkout to receive a discount on their rent.
+
+---
+
+## Technology Stack & Key Packages
+
+This project is built with the MERN stack and utilizes several modern libraries for a robust and efficient user experience.
+
+### Frontend (`a12-bms-client`)
+
+- **Framework:** React
+- **Routing:** React Router
+- **Styling:** Tailwind CSS with daisyUI component library
+- **State Management:** TanStack Query (for server state management and caching)
+- **HTTP Client:** Axios (with interceptors for JWT handling)
+- **Authentication:** Firebase (Client SDK)
+- **Forms:** React Hook Form
+- **Notifications:** SweetAlert2 & React-Toastify
+- **Mapping:** Leaflet & React-Leaflet
+
+### Backend (`a12-bms-server`)
+
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** MongoDB
+- **Authentication:** Firebase Admin SDK (for JWT verification)
+
+---
+
+## Getting Started
+
+To run this project locally, you will need to set up both the client and server environments.
+
+### Prerequisites
+
+- Node.js and npm
+- MongoDB account
+- Firebase project
+
+### 1. Server Setup
+
+```bash
+# Navigate to the server directory
+cd a12-bms-server
+
+# Install dependencies
+npm install
+
+# Create a .env file with your database credentials
+# DB_USER=your_mongodb_user
+# DB_PASS=your_mongodb_password
+
+# Place your firebase-service-account.json file in the root of the server directory.
+
+# Start the server
+npm start
+```
+
+### 2. Client Setup
+
+```bash
+# Navigate to the client directory
+cd a12-bms-client
+
+# Install dependencies
+npm install
+
+# Create a .env.local file with your Firebase client configuration
+# VITE_API_KEY=...
+# VITE_AUTH_DOMAIN=...
+# VITE_PROJECT_ID=...
+# VITE_STORAGE_BUCKET=...
+# VITE_MESSAGING_SENDER_ID=...
+# VITE_APP_ID=...
+
+# Start the client development server
+npm run dev
+```
