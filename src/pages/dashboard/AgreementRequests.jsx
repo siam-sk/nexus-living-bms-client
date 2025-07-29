@@ -14,7 +14,7 @@ const AgreementRequests = () => {
         },
     });
 
-    const handleMutation = (mutationFn, successText) => {
+    const useHandleMutation = (mutationFn, successText) => {
         return useMutation({
             mutationFn,
             onSuccess: () => {
@@ -27,12 +27,12 @@ const AgreementRequests = () => {
         });
     };
 
-    const acceptMutation = handleMutation(async (id) => {
+    const acceptMutation = useHandleMutation(async (id) => {
         const res = await axiosSecure.patch(`/agreements/accept/${id}`);
         return res.data;
     }, 'Agreement accepted and user role updated to member.');
     
-    const rejectMutation = handleMutation(async (id) => {
+    const rejectMutation = useHandleMutation(async (id) => {
         const res = await axiosSecure.patch(`/agreements/reject/${id}`);
         return res.data;
     }, 'Agreement has been rejected.');

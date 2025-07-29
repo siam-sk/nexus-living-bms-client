@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const ManageCoupons = () => {
@@ -16,7 +17,7 @@ const ManageCoupons = () => {
         },
     });
 
-    const mutation = useMutation({
+    const addCouponMutation = useMutation({
         mutationFn: async (data) => {
             const res = await axiosSecure.post('/coupons', data);
             return res.data;
@@ -32,13 +33,31 @@ const ManageCoupons = () => {
         },
     });
 
+    const toggleAvailabilityMutation = useMutation({
+        mutationFn: async (couponId) => {
+            const res = await axiosSecure.patch(`/coupons/toggle/${couponId}`);
+            return res.data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['coupons'] });
+            toast.success('Coupon status updated!');
+        },
+        onError: (err) => {
+            toast.error(err.message || 'Could not update coupon status.');
+        }
+    });
+
     const onSubmit = (data) => {
         // Convert percentage to a number
         const couponData = {
             ...data,
             discount_percentage: parseInt(data.discount_percentage, 10),
         };
-        mutation.mutate(couponData);
+        addCouponMutation.mutate(couponData);
+    };
+
+    const handleToggleAvailability = (couponId) => {
+        toggleAvailabilityMutation.mutate(couponId);
     };
 
     if (isLoading) return <div className="flex justify-center items-center h-64"><span className="loading loading-spinner loading-lg text-primary"></span></div>;
@@ -62,6 +81,8 @@ const ManageCoupons = () => {
                             <th>Coupon Code</th>
                             <th>Discount Percentage</th>
                             <th>Description</th>
+                            <th>Availability</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -71,10 +92,24 @@ const ManageCoupons = () => {
                                     <td className="font-mono bg-base-200 text-accent font-bold">{coupon.coupon_code}</td>
                                     <td>{coupon.discount_percentage}%</td>
                                     <td>{coupon.description}</td>
+                                    <td>
+                                        <span className={`badge ${coupon.availability === 'available' ? 'badge-success' : 'badge-error'}`}>
+                                            {coupon.availability}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button 
+                                            onClick={() => handleToggleAvailability(coupon._id)}
+                                            className={`btn btn-sm ${coupon.availability === 'available' ? 'btn-warning' : 'btn-info'}`}
+                                            disabled={toggleAvailabilityMutation.isPending}
+                                        >
+                                            {coupon.availability === 'available' ? 'Make Unavailable' : 'Make Available'}
+                                        </button>
+                                    </td>
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="3" className="text-center py-4">No coupons found. Add one to get started!</td></tr>
+                            <tr><td colSpan="5" className="text-center py-4">No coupons found. Add one to get started!</td></tr>
                         )}
                     </tbody>
                 </table>
@@ -100,8 +135,8 @@ const ManageCoupons = () => {
                             <label className="label"><span className="label-text">Coupon Description</span></label>
                             <textarea {...register('description', { required: true })} className={`textarea textarea-bordered ${errors.description ? 'textarea-error' : ''}`}></textarea>
                         </div>
-                        <button type="submit" className="btn btn-primary w-full" disabled={mutation.isPending}>
-                            {mutation.isPending ? 'Adding...' : 'Add Coupon'}
+                        <button type="submit" className="btn btn-primary w-full" disabled={addCouponMutation.isPending}>
+                            {addCouponMutation.isPending ? 'Adding...' : 'Add Coupon'}
                         </button>
                     </form>
                 </div>
