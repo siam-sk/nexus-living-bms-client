@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthProvider';
 import useAdmin from '../hooks/useAdmin';
 import useMember from '../hooks/useMember';
@@ -8,12 +8,14 @@ const DashboardLayout = () => {
     const { user } = useContext(AuthContext);
     const [isAdmin, isAdminLoading] = useAdmin();
     const [isMember, isMemberLoading] = useMember();
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
 
     const navLinkClass = ({ isActive }) =>
         `flex items-center px-4 py-2.5 text-base font-medium rounded-lg transition-all duration-300 ease-in-out hover:bg-secondary hover:text-white ${
             isActive ? 'bg-secondary text-white shadow-lg' : 'text-primary-content/80'
         }`;
 
+    
     const userLinks = (
         <>
             <li>
@@ -95,47 +97,65 @@ const DashboardLayout = () => {
         </>
     );
 
-    return (
-        <div className="flex min-h-screen bg-base-200">
-            {/* Sidebar */}
-            <div className="w-72 bg-primary text-primary-content p-6 flex flex-col shadow-2xl">
-                <div className="flex items-center gap-4 mb-8 border-b border-primary-content/20 pb-6">
-                    <div className="avatar">
-                        <div className="w-14 rounded-full ring ring-secondary ring-offset-base-100 ring-offset-2">
-                            <img src={user?.photoURL || 'https://i.ibb.co/1zShS2c/default-avatar-icon-of-social-media-user-vector.jpg'} alt="User" />
-                        </div>
-                    </div>
-                    <div>
-                        <h2 className="font-bold text-xl">{user?.displayName || 'User'}</h2>
-                        <p className="text-sm opacity-70">{isAdmin ? 'Admin' : isMember ? 'Member' : 'Resident'}</p>
+    const sidebarContent = (
+        <>
+            <div className="flex items-center gap-4 mb-8 border-b border-primary-content/20 pb-6">
+                <div className="avatar">
+                    <div className="w-14 rounded-full ring ring-secondary ring-offset-base-100 ring-offset-2">
+                        <img src={user?.photoURL || 'https://i.ibb.co/1zShS2c/default-avatar-icon-of-social-media-user-vector.jpg'} alt="User" />
                     </div>
                 </div>
-
-                <ul className="menu space-y-3 flex-grow">
-                    {isAdminLoading || isMemberLoading ? <span className="loading loading-spinner text-white"></span> : (isAdmin ? adminLinks : (isMember ? memberLinks : userLinks))}
-                </ul>
-
-                <div className="divider before:bg-primary-content/20 after:bg-primary-content/20"></div>
-                
-                <ul className="menu space-y-3">
-                    <li>
-                        <NavLink to="/" className={navLinkClass}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /></svg>
-                            Home
-                        </NavLink>
-                    </li>
-                     <li>
-                        <NavLink to="/apartment" className={navLinkClass}>
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
-                            Apartment
-                        </NavLink>
-                    </li>
-                </ul>
+                <div>
+                    <h2 className="font-bold text-xl">{user?.displayName || 'User'}</h2>
+                    <p className="text-sm opacity-70">{isAdmin ? 'Admin' : isMember ? 'Member' : 'Resident'}</p>
+                </div>
             </div>
-            {/* Content Area */}
-            <main className="flex-1 p-10">
-                <Outlet />
-            </main>
+
+            <ul className="menu space-y-3 flex-grow">
+                {isAdminLoading || isMemberLoading ? <span className="loading loading-spinner text-white"></span> : (isAdmin ? adminLinks : (isMember ? memberLinks : userLinks))}
+            </ul>
+
+            <div className="divider before:bg-primary-content/20 after:bg-primary-content/20"></div>
+            
+            <ul className="menu space-y-3">
+                <li>
+                    <NavLink to="/" className={navLinkClass}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" /></svg>
+                        Home
+                    </NavLink>
+                </li>
+            </ul>
+        </>
+    );
+
+    return (
+        <div className="flex min-h-screen bg-base-200">
+            {/* Sidebar for larger screens */}
+            <div className="w-72 bg-primary text-primary-content p-6 flex-col shadow-2xl hidden lg:flex">
+                {sidebarContent}
+            </div>
+
+            {/* Mobile Sidebar (Overlay) */}
+            <div className={`fixed inset-0 z-40 flex lg:hidden ${isSidebarOpen ? '' : 'pointer-events-none'}`}>
+                <div className={`fixed inset-y-0 left-0 w-72 bg-primary text-primary-content p-6 flex flex-col shadow-2xl transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+                    {sidebarContent}
+                </div>
+                <div className={`flex-1 bg-black transition-opacity duration-300 ease-in-out ${isSidebarOpen ? 'opacity-50' : 'opacity-0'}`} onClick={() => setSidebarOpen(false)}></div>
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col">
+                {/* Mobile Header */}
+                <div className="lg:hidden bg-base-100 shadow-md p-2 flex items-center">
+                    <button onClick={() => setSidebarOpen(true)} className="btn btn-ghost">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                    <h1 className="text-lg font-bold text-primary ml-2">Dashboard</h1>
+                </div>
+                <main className="p-6 lg:p-10 flex-1">
+                    <Outlet />
+                </main>
+            </div>
         </div>
     );
 };

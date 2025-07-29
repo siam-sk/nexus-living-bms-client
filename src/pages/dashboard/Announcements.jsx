@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const AnnouncementCard = ({ announcement }) => {
     const { title, content, date, type } = announcement;
@@ -34,29 +35,25 @@ const AnnouncementCard = ({ announcement }) => {
 
 
 const Announcements = () => {
-    const [announcements, setAnnouncements] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const axiosSecure = useAxiosSecure();
 
-    useEffect(() => {
-        fetch('http://localhost:5000/announcements')
-            .then(res => res.json())
-            .then(data => {
-                setAnnouncements(data);
-                setLoading(false);
-            })
-            .catch(error => {
-                console.error("Failed to fetch announcements:", error);
-                setLoading(false);
-            });
-    }, []);
+    const { data: announcements = [], isLoading, isError, error } = useQuery({
+        queryKey: ['announcements'],
+        queryFn: async () => {
+            const res = await axiosSecure.get('/announcements');
+            return res.data;
+        }
+    });
 
     return (
         <div>
             <h1 className="text-4xl font-bold text-primary mb-8">Announcements</h1>
-            {loading ? (
+            {isLoading ? (
                 <div className="flex justify-center items-center h-64">
                     <span className="loading loading-spinner loading-lg text-primary"></span>
                 </div>
+            ) : isError ? (
+                <div className="text-red-500 text-center">Error: {error.message}</div>
             ) : (
                 <div className="space-y-6">
                     {announcements.length > 0 ? (

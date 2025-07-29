@@ -67,13 +67,9 @@ const ManageCoupons = () => {
         <div>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-4xl font-bold text-primary">Manage Coupons</h1>
-                <button className="btn btn-primary" onClick={() => document.getElementById('add_coupon_modal').showModal()}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
-                    Add Coupon
-                </button>
+                <button className="btn btn-primary" onClick={() => document.getElementById('add_coupon_modal').showModal()}>Add Coupon</button>
             </div>
 
-            {/* Coupon Table */}
             <div className="overflow-x-auto bg-base-100 rounded-lg shadow-md">
                 <table className="table">
                     <thead className="bg-base-200">

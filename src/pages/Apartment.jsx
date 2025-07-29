@@ -1,8 +1,9 @@
-import { useEffect, useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { AuthContext } from '../contexts/AuthProvider';
 import toast from 'react-hot-toast';
 import useAxiosSecure from '../hooks/useAxiosSecure';
+import { useQuery } from '@tanstack/react-query';
 
 const ApartmentCard = ({ apartment }) => {
   const { image, floor_no, block_name, apartment_no, rent } = apartment;
@@ -72,13 +73,30 @@ const ApartmentCard = ({ apartment }) => {
 };
 
 const Apartment = () => {
-  const [apartments, setApartments] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [count, setCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [appliedQuery, setAppliedQuery] = useState({ min: '', max: '' });
   const [selectedRange, setSelectedRange] = useState('');
   const itemsPerPage = 6;
+  const axiosSecure = useAxiosSecure();
+
+  const { data, isLoading, isError, error } = useQuery({
+    queryKey: ['apartments', currentPage, appliedQuery],
+    queryFn: async () => {
+      const res = await axiosSecure.get('/apartments', {
+        params: {
+          page: currentPage,
+          size: itemsPerPage,
+          minRent: appliedQuery.min,
+          maxRent: appliedQuery.max,
+        },
+      });
+      return res.data;
+    },
+    keepPreviousData: true,
+  });
+
+  const apartments = data?.apartments || [];
+  const count = data?.count || 0;
 
   const rentRanges = [
     { label: 'All Prices', value: '' },
@@ -89,29 +107,6 @@ const Apartment = () => {
 
   const numberOfPages = Math.ceil(count / itemsPerPage);
   const pages = [...Array(numberOfPages).keys()];
-
-  useEffect(() => {
-    setLoading(true);
-    let url = `http://localhost:5000/apartments?page=${currentPage}&size=${itemsPerPage}`;
-    if (appliedQuery.min) {
-      url += `&minRent=${appliedQuery.min}`;
-    }
-    if (appliedQuery.max) {
-      url += `&maxRent=${appliedQuery.max}`;
-    }
-
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        setApartments(data.apartments);
-        setCount(data.count);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error('Failed to fetch apartments:', error);
-        setLoading(false);
-      });
-  }, [currentPage, itemsPerPage, appliedQuery]);
 
   const handleFilterChange = (e) => {
     const currentSelectedRange = e.target.value;
@@ -126,12 +121,16 @@ const Apartment = () => {
     setCurrentPage(0); 
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[calc(100vh-200px)]">
         <span className="loading loading-spinner loading-lg text-primary"></span>
       </div>
     );
+  }
+
+  if (isError) {
+    return <div className="text-center text-red-500">Error fetching apartments: {error.message}</div>;
   }
 
   return (
@@ -148,9 +147,9 @@ const Apartment = () => {
 
       {/* Search Section */}
       <div className="mb-12 p-6 bg-base-200 rounded-lg shadow-md">
-        <div className="flex items-center justify-center gap-4">
-          <h3 className="text-xl font-semibold">Filter by Rent:</h3>
-          <div className="form-control">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+          <h3 className="text-xl font-semibold mb-2 md:mb-0">Filter by Rent:</h3>
+          <div className="form-control w-full md:w-auto">
             <select
               onChange={handleFilterChange}
               className="select select-bordered w-full max-w-xs"
