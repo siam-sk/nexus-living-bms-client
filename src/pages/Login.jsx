@@ -29,11 +29,29 @@ const Login = () => {
   const handleGoogleSignIn = () => {
     const toastId = toast.loading('Signing in with Google...');
     googleSignIn()
-      .then(() => {
-        toast.success('Logged in successfully!', { id: toastId });
-        navigate(from, { replace: true });
+      .then((result) => {
+        
+        const userInfo = {
+          email: result.user?.email,
+          name: result.user?.displayName,
+          photoURL: result.user?.photoURL,
+        };
+        fetch('http://localhost:5000/users', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(userInfo),
+        })
+          .then(res => res.json())
+          .then(() => {
+            toast.success('Logged in successfully!', { id: toastId });
+            navigate(from, { replace: true });
+          });
       })
-      .catch((error) => toast.error(error.message, { id: toastId }));
+      .catch((error) => {
+        toast.error(error.message, { id: toastId });
+      });
   };
 
   return (

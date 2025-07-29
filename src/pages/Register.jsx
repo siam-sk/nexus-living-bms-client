@@ -37,8 +37,24 @@ const Register = () => {
       .then(() => {
         updateUserProfile(name, photoURL)
           .then(() => {
-            toast.success('Account created successfully!', { id: toastId });
-            navigate('/');
+            
+            const userInfo = {
+              name,
+              email,
+              photoURL,
+            };
+            fetch('http://localhost:5000/users', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(userInfo),
+            })
+              .then(res => res.json())
+              .then(() => {
+                toast.success('Account created successfully!', { id: toastId });
+                navigate('/');
+              });
           })
           .catch((error) => {
             toast.error(error.message, { id: toastId });

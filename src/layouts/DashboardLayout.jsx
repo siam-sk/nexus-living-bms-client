@@ -2,10 +2,12 @@ import { NavLink, Outlet } from 'react-router';
 import { useContext } from 'react';
 import { AuthContext } from '../contexts/AuthProvider';
 import useAdmin from '../hooks/useAdmin';
+import useMember from '../hooks/useMember';
 
 const DashboardLayout = () => {
     const { user } = useContext(AuthContext);
     const [isAdmin, isAdminLoading] = useAdmin();
+    const [isMember, isMemberLoading] = useMember();
 
     const navLinkClass = ({ isActive }) =>
         `flex items-center px-4 py-2.5 text-base font-medium rounded-lg transition-all duration-300 ease-in-out hover:bg-secondary hover:text-white ${
@@ -18,6 +20,35 @@ const DashboardLayout = () => {
                 <NavLink to="/dashboard/my-profile" className={navLinkClass}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                     My Profile
+                </NavLink>
+            </li>
+            <li>
+                <NavLink to="/dashboard/announcements" className={navLinkClass}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 01-4.5-4.5v-4.5a4.5 4.5 0 014.5-4.5h7.5a4.5 4.5 0 014.5 4.5v1.5m-4.5-4.5h.008c.088 0 .176.002.26.006M18 12a6 6 0 11-12 0 6 6 0 0112 0z" /></svg>
+                    Announcements
+                </NavLink>
+            </li>
+        </>
+    );
+
+    const memberLinks = (
+        <>
+            <li>
+                <NavLink to="/dashboard/my-profile" className={navLinkClass}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    My Profile
+                </NavLink>
+            </li>
+            <li>
+                <NavLink to="/dashboard/make-payment" className={navLinkClass}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 21z" /></svg>
+                    Make Payment
+                </NavLink>
+            </li>
+            <li>
+                <NavLink to="/dashboard/payment-history" className={navLinkClass}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    Payment History
                 </NavLink>
             </li>
             <li>
@@ -76,12 +107,12 @@ const DashboardLayout = () => {
                     </div>
                     <div>
                         <h2 className="font-bold text-xl">{user?.displayName || 'User'}</h2>
-                        <p className="text-sm opacity-70">{isAdmin ? 'Admin' : 'Resident'}</p>
+                        <p className="text-sm opacity-70">{isAdmin ? 'Admin' : isMember ? 'Member' : 'Resident'}</p>
                     </div>
                 </div>
 
                 <ul className="menu space-y-3 flex-grow">
-                    {isAdminLoading ? <span className="loading loading-spinner text-white"></span> : (isAdmin ? adminLinks : userLinks)}
+                    {isAdminLoading || isMemberLoading ? <span className="loading loading-spinner text-white"></span> : (isAdmin ? adminLinks : (isMember ? memberLinks : userLinks))}
                 </ul>
 
                 <div className="divider before:bg-primary-content/20 after:bg-primary-content/20"></div>
