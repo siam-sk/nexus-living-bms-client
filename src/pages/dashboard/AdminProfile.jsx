@@ -1,22 +1,18 @@
 import { useContext } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AuthContext } from '../../contexts/AuthProvider';
-
-// Function to fetch admin stats
-const fetchAdminStats = async () => {
-    const res = await fetch('http://localhost:5000/admin-stats');
-    if (!res.ok) {
-        throw new Error('Failed to fetch admin statistics');
-    }
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const AdminProfile = () => {
     const { user } = useContext(AuthContext);
+    const axiosSecure = useAxiosSecure();
 
     const { data: stats, isLoading, isError, error } = useQuery({
         queryKey: ['adminStats'],
-        queryFn: fetchAdminStats,
+        queryFn: async () => {
+            const res = await axiosSecure.get('/admin-stats');
+            return res.data;
+        },
     });
 
     return (

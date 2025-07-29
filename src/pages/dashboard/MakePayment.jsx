@@ -4,25 +4,13 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { AuthContext } from '../../contexts/AuthProvider';
 import { useNavigate } from 'react-router';
-
-const fetchAgreement = async (email) => {
-    if (!email) return null;
-    const res = await fetch(`http://localhost:5000/agreement/${email}`);
-    if (!res.ok) throw new Error('Failed to fetch agreement details');
-    return res.json();
-};
-
-const validateCoupon = async (code) => {
-    if (!code) return null;
-    const res = await fetch(`http://localhost:5000/coupons/${code}`);
-    if (!res.ok) throw new Error('Coupon validation failed');
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const MakePayment = () => {
     const { user } = useContext(AuthContext);
     const { register, handleSubmit, formState: { errors } } = useForm();
     const navigate = useNavigate();
+    const axiosSecure = useAxiosSecure();
 
     const [couponCode, setCouponCode] = useState('');
     const [payableRent, setPayableRent] = useState(0);
@@ -30,7 +18,11 @@ const MakePayment = () => {
 
     const { data: agreement, isLoading } = useQuery({
         queryKey: ['agreement', user?.email],
-        queryFn: () => fetchAgreement(user?.email),
+        queryFn: async () => {
+            if (!user?.email) return null;
+            const res = await axiosSecure.get(`/agreement/${user.email}`);
+            return res.data;
+        },
         enabled: !!user?.email,
     });
 
@@ -44,7 +36,8 @@ const MakePayment = () => {
     const handleApplyCoupon = async () => {
         if (!couponCode) return Swal.fire('Oops!', 'Please enter a coupon code.', 'warning');
         try {
-            const coupon = await validateCoupon(couponCode);
+            const res = await axiosSecure.get(`/coupons/${couponCode}`);
+            const coupon = res.data;
             if (coupon) {
                 const discount = (originalRent * coupon.discount_percentage) / 100;
                 setPayableRent(originalRent - discount);

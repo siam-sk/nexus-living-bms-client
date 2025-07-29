@@ -2,12 +2,14 @@ import { useEffect, useState, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { AuthContext } from '../contexts/AuthProvider';
 import toast from 'react-hot-toast';
+import useAxiosSecure from '../hooks/useAxiosSecure';
 
 const ApartmentCard = ({ apartment }) => {
   const { image, floor_no, block_name, apartment_no, rent } = apartment;
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const axiosSecure = useAxiosSecure();
 
   const handleAgreement = () => {
     if (user && user.email) {
@@ -24,26 +26,14 @@ const ApartmentCard = ({ apartment }) => {
         request_date: new Date(),
       };
 
-      fetch('http://localhost:5000/agreements', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(agreementData),
-      })
+      axiosSecure.post('/agreements', agreementData)
         .then(res => {
-          if (!res.ok) {
-            return res.json().then(err => { throw new Error(err.message) });
-          }
-          return res.json();
-        })
-        .then(data => {
-          if (data.insertedId) {
+          if (res.data.insertedId) {
             toast.success('Agreement request submitted successfully!', { id: toastId });
           }
         })
         .catch(error => {
-          toast.error(error.message || 'Failed to submit request.', { id: toastId });
+          toast.error(error.response?.data?.message || 'Failed to submit request.', { id: toastId });
         });
     } else {
       toast.error('You must be logged in to make an agreement.');

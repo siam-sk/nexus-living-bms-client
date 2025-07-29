@@ -1,27 +1,23 @@
 import { useContext, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { AuthContext } from '../../contexts/AuthProvider';
-
-// Function to fetch payment history
-const fetchPaymentHistory = async (email, searchMonth) => {
-    if (!email) return [];
-    const url = new URL(`http://localhost:5000/payments/${email}`);
-    if (searchMonth) {
-        url.searchParams.append('month', searchMonth);
-    }
-    const res = await fetch(url.toString());
-    if (!res.ok) throw new Error('Failed to fetch payment history');
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const PaymentHistory = () => {
     const { user } = useContext(AuthContext);
     const [search, setSearch] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const axiosSecure = useAxiosSecure();
 
     const { data: payments, isLoading, isError, error } = useQuery({
         queryKey: ['paymentHistory', user?.email, searchTerm],
-        queryFn: () => fetchPaymentHistory(user?.email, searchTerm),
+        queryFn: async () => {
+            if (!user?.email) return [];
+            const res = await axiosSecure.get(`/payments/${user.email}`, {
+                params: { month: searchTerm }
+            });
+            return res.data;
+        },
         enabled: !!user?.email,
     });
 

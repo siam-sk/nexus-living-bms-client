@@ -1,39 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
-
-// Function to fetch members
-const fetchMembers = async () => {
-    const res = await fetch('http://localhost:5000/users/members');
-    if (!res.ok) {
-        throw new Error('Network response was not ok');
-    }
-    return res.json();
-};
-
-// Function to remove a member (change role to user)
-const removeMember = async (userId) => {
-    const res = await fetch(`http://localhost:5000/users/member/${userId}`, {
-        method: 'PATCH',
-    });
-    if (!res.ok) {
-        throw new Error('Failed to update user role');
-    }
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const ManageMembers = () => {
     const queryClient = useQueryClient();
+    const axiosSecure = useAxiosSecure();
 
-    const { data: members, isLoading, isError, error } = useQuery({
+    const { data: members, isLoading, isError, error, refetch } = useQuery({
         queryKey: ['members'],
-        queryFn: fetchMembers,
+        queryFn: async () => {
+            const res = await axiosSecure.get('/users/members');
+            return res.data;
+        },
     });
 
     const mutation = useMutation({
-        mutationFn: removeMember,
+        mutationFn: async (userId) => {
+            const res = await axiosSecure.patch(`/users/member/${userId}`);
+            return res.data;
+        },
         onSuccess: () => {
-            // Invalidate and refetch the members query to update the list
-            queryClient.invalidateQueries({ queryKey: ['members'] });
+            refetch();
             Swal.fire({
                 title: 'Success!',
                 text: 'Member has been removed and their role is now "user".',

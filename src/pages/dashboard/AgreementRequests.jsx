@@ -1,33 +1,17 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
-
-// Fetch pending agreements
-const fetchPendingAgreements = async () => {
-    const res = await fetch('http://localhost:5000/agreements');
-    if (!res.ok) throw new Error('Failed to fetch agreement requests');
-    return res.json();
-};
-
-// API call function for accepting
-const acceptAgreement = async (id) => {
-    const res = await fetch(`http://localhost:5000/agreements/accept/${id}`, { method: 'PATCH' });
-    if (!res.ok) throw new Error('Failed to accept agreement');
-    return res.json();
-};
-
-// API call function for rejecting
-const rejectAgreement = async (id) => {
-    const res = await fetch(`http://localhost:5000/agreements/reject/${id}`, { method: 'PATCH' });
-    if (!res.ok) throw new Error('Failed to reject agreement');
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const AgreementRequests = () => {
     const queryClient = useQueryClient();
+    const axiosSecure = useAxiosSecure();
 
     const { data: requests, isLoading, isError, error } = useQuery({
         queryKey: ['pendingAgreements'],
-        queryFn: fetchPendingAgreements,
+        queryFn: async () => {
+            const res = await axiosSecure.get('/agreements');
+            return res.data;
+        },
     });
 
     const handleMutation = (mutationFn, successText) => {
@@ -43,8 +27,15 @@ const AgreementRequests = () => {
         });
     };
 
-    const acceptMutation = handleMutation(acceptAgreement, 'Agreement accepted and user role updated to member.');
-    const rejectMutation = handleMutation(rejectAgreement, 'Agreement has been rejected.');
+    const acceptMutation = handleMutation(async (id) => {
+        const res = await axiosSecure.patch(`/agreements/accept/${id}`);
+        return res.data;
+    }, 'Agreement accepted and user role updated to member.');
+    
+    const rejectMutation = handleMutation(async (id) => {
+        const res = await axiosSecure.patch(`/agreements/reject/${id}`);
+        return res.data;
+    }, 'Agreement has been rejected.');
 
     const handleAccept = (id) => {
         acceptMutation.mutate(id);

@@ -1,36 +1,26 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-
-// Fetch all coupons
-const fetchCoupons = async () => {
-    const res = await fetch('http://localhost:5000/coupons');
-    if (!res.ok) throw new Error('Failed to fetch coupons');
-    return res.json();
-};
-
-// Post a new coupon
-const addCoupon = async (data) => {
-    const res = await fetch('http://localhost:5000/coupons', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) throw new Error('Failed to add coupon');
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const ManageCoupons = () => {
     const queryClient = useQueryClient();
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
+    const axiosSecure = useAxiosSecure();
 
     const { data: coupons, isLoading, isError, error } = useQuery({
         queryKey: ['coupons'],
-        queryFn: fetchCoupons,
+        queryFn: async () => {
+            const res = await axiosSecure.get('/coupons');
+            return res.data;
+        },
     });
 
     const mutation = useMutation({
-        mutationFn: addCoupon,
+        mutationFn: async (data) => {
+            const res = await axiosSecure.post('/coupons', data);
+            return res.data;
+        },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['coupons'] });
             reset();

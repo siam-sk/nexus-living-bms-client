@@ -1,30 +1,19 @@
 import { useLocation, useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
 import { useMutation } from '@tanstack/react-query';
-
-// Function to save payment details to the database
-const savePayment = async (paymentData) => {
-    const res = await fetch('http://localhost:5000/payments', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paymentData),
-    });
-    if (!res.ok) {
-        throw new Error('Failed to save payment record.');
-    }
-    return res.json();
-};
-
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const PaymentGateway = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { paymentDetails } = location.state || {};
+    const axiosSecure = useAxiosSecure();
 
     const mutation = useMutation({
-        mutationFn: savePayment,
+        mutationFn: async (paymentData) => {
+            const res = await axiosSecure.post('/payments', paymentData);
+            return res.data;
+        },
         onSuccess: () => {
             Swal.fire({
                 title: 'Payment Successful!',

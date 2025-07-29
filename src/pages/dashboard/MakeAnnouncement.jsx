@@ -1,21 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
-
-// Function to post a new announcement
-const postAnnouncement = async (data) => {
-    const res = await fetch('http://localhost:5000/announcements', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    });
-    if (!res.ok) {
-        throw new Error('Failed to post announcement');
-    }
-    return res.json();
-};
+import useAxiosSecure from '../../hooks/useAxiosSecure';
 
 const MakeAnnouncement = () => {
     const {
@@ -24,9 +10,13 @@ const MakeAnnouncement = () => {
         reset,
         formState: { errors },
     } = useForm();
+    const axiosSecure = useAxiosSecure();
 
     const mutation = useMutation({
-        mutationFn: postAnnouncement,
+        mutationFn: async (data) => {
+            const res = await axiosSecure.post('/announcements', data);
+            return res.data;
+        },
         onSuccess: () => {
             reset();
             Swal.fire({
