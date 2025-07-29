@@ -5,8 +5,8 @@ Nexus Living is a full-stack web application designed to streamline the manageme
 **Live URL:** [https://nexus-living.web.app](https://nexus-living.web.app)
 
 **GitHub Repositories:**
-- **Client-Side:** [https://github.com/your-username/a12-bms-client](https://github.com/your-username/a12-bms-client)
-- **Server-Side:** [https://github.com/your-username/a12-bms-server](https://github.com/your-username/a12-bms-server)
+- **Client-Side:** [https://github.com/Programming-Hero-Web-Course4/b11a12-client-side-siam-sk](https://github.com/Programming-Hero-Web-Course4/b11a12-client-side-siam-sk)
+- **Server-Side:** [https://github.com/Programming-Hero-Web-Course4/b11a12-server-side-siam-sk](https://github.com/Programming-Hero-Web-Course4/b11a12-server-side-siam-sk)
 
 ---
 
@@ -28,12 +28,12 @@ Nexus Living is a full-stack web application designed to streamline the manageme
     - **User Dashboard:** A basic view for registered users to manage their profile and see announcements.
 
 - **Apartment & Agreement System:**
-    - Publicly viewable list of apartments with pagination.
-    - Users can submit an agreement request for an apartment.
+    - Publicly viewable list of apartments with pagination and rent-range filtering.
+    - Users can submit an agreement request for an apartment (one per user).
     - Admins can accept or reject agreement requests, which automatically updates the user's role and the room's availability.
 
 - **Payment & Coupon System:**
-    - Members can make monthly rent payments through a simulated payment gateway.
+    - Members can make monthly rent payments through a secure payment gateway.
     - A dynamic coupon system allows admins to create and manage discount coupons.
     - Members can apply valid coupons at checkout to receive a discount on their rent.
 
@@ -52,7 +52,7 @@ This project is built with the MERN stack and utilizes several modern libraries 
 - **HTTP Client:** Axios (with interceptors for JWT handling)
 - **Authentication:** Firebase (Client SDK)
 - **Forms:** React Hook Form
-- **Notifications:** SweetAlert2 & React-Toastify
+- **Notifications:** SweetAlert2 & React Hot Toast
 - **Mapping:** Leaflet & React-Leaflet
 
 ### Backend (`a12-bms-server`)
@@ -61,12 +61,11 @@ This project is built with the MERN stack and utilizes several modern libraries 
 - **Framework:** Express.js
 - **Database:** MongoDB
 - **Authentication:** Firebase Admin SDK (for JWT verification)
+- **Deployment:** Vercel
 
 ---
 
-## Getting Started
-
-To run this project locally, you will need to set up both the client and server environments.
+## Getting Started & Deployment
 
 ### Prerequisites
 
@@ -74,7 +73,7 @@ To run this project locally, you will need to set up both the client and server 
 - MongoDB account
 - Firebase project
 
-### 1. Server Setup
+### 1. Local Server Setup
 
 ```bash
 # Navigate to the server directory
@@ -93,7 +92,7 @@ npm install
 npm start
 ```
 
-### 2. Client Setup
+### 2. Local Client Setup
 
 ```bash
 # Navigate to the client directory
@@ -109,7 +108,23 @@ npm install
 # VITE_STORAGE_BUCKET=...
 # VITE_MESSAGING_SENDER_ID=...
 # VITE_APP_ID=...
+# VITE_API_URL=http://localhost:5000
 
 # Start the client development server
 npm run dev
 ```
+
+### 3. Deployment
+
+- The **frontend** is deployed on **Firebase Hosting**.
+- The **backend** is deployed on **Vercel**.
+
+**Vercel Environment Variables:**
+- `DB_USER`: Your MongoDB username.
+- `DB_PASS`: Your MongoDB password.
+- `SERVICE_ACCOUNT_JSON`: The complete JSON content from your Firebase service account file.
+
+**Post-Deployment Configuration:**
+1.  Add the deployed Vercel server URL to the `cors` options in `index.js`.
+2.  Add the deployed Vercel server URL to the **Authorized domains** in your Firebase Authentication settings.
+3.  Create a `.env.production` file in the client directory with `VITE_API_URL` pointing to your Vercel server URL before
