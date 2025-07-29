@@ -14,6 +14,10 @@ import ManageMembers from "../pages/dashboard/ManageMembers";
 import MakeAnnouncement from "../pages/dashboard/MakeAnnouncement";
 import AgreementRequests from "../pages/dashboard/AgreementRequests";
 import ManageCoupons from "../pages/dashboard/ManageCoupons";
+import MemberRoute from "./MemberRoute";
+import MakePayment from "../pages/dashboard/MakePayment";
+import PaymentHistory from "../pages/dashboard/PaymentHistory";
+import PaymentGateway from "../pages/dashboard/PaymentGateway";
 
 export const router = createBrowserRouter([
     {
@@ -51,7 +55,19 @@ export const router = createBrowserRouter([
                 path: 'announcements',
                 element: <Announcements />
             },
-            // Admin Routes
+            {
+                path: 'make-payment',
+                element: <MemberRoute><MakePayment /></MemberRoute>
+            },
+            {
+                path: 'payment-history',
+                element: <MemberRoute><PaymentHistory /></MemberRoute>
+            },
+            {
+                path: 'payment-gateway',
+                element: <MemberRoute><PaymentGateway /></MemberRoute>
+            },
+            // Admin Only Routes
             {
                 path: 'admin-profile',
                 element: <AdminRoute><AdminProfile /></AdminRoute>
