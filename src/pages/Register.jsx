@@ -13,7 +13,10 @@ const Register = () => {
     setPasswordError('');
     const form = event.target;
     const name = form.name.value;
-    const photoURL = form.photoURL.value;
+    let photoURL = form.photoURL.value;
+    if (!photoURL) {
+      photoURL = 'https://i.ibb.co/1zShS2c/default-avatar-icon-of-social-media-user-vector.jpg';
+    }
     const email = form.email.value;
     const password = form.password.value;
 
@@ -89,9 +92,8 @@ const Register = () => {
             <input
               type="text"
               name="photoURL"
-              placeholder="Your Photo URL"
+              placeholder="Your Photo URL (Optional)"
               className="input input-bordered"
-              required
             />
           </div>
           <div className="form-control">

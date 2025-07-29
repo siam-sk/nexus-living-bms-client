@@ -55,13 +55,13 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-gray-800 text-white mt-16">
+    <footer className="bg-primary text-primary-content mt-16 border-t-4 border-accent">
       <div className="container mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="md:col-span-2 lg:col-span-1">
             <h3 className="text-2xl font-bold mb-4">Nexus Living</h3>
-            <p className="text-gray-400">
+            <p className="text-primary-content/80">
               Experience unparalleled luxury and comfort in the heart of the
               city. Your new home is waiting.
             </p>
@@ -69,29 +69,32 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold uppercase tracking-wider mb-4">
+              Quick Links
+            </h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="hover:text-primary transition-colors">
+                <Link
+                  to="/"
+                  className="hover:text-accent transition-colors"
+                >
                   Home
                 </Link>
               </li>
               <li>
                 <Link
                   to="/apartment"
-                  className="hover:text-primary transition-colors"
+                  className="hover:text-accent transition-colors"
                 >
                   Apartments
                 </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-primary transition-colors">
+                <a
+                  href="#"
+                  className="hover:text-accent transition-colors"
+                >
                   Amenities
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">
-                  Contact
                 </a>
               </li>
             </ul>
@@ -99,18 +102,23 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <address className="not-italic text-gray-400 space-y-2">
+            <h3 className="text-lg font-semibold uppercase tracking-wider mb-4">
+              Contact Us
+            </h3>
+            <address className="not-italic text-primary-content/80 space-y-2">
               <p>123 Nexus Avenue, Urbanopolis, 12345</p>
               <p>
-                <a href="tel:+1234567890" className="hover:text-primary">
+                <a
+                  href="tel:+1234567890"
+                  className="hover:text-accent transition-colors"
+                >
                   (123) 456-7890
                 </a>
               </p>
               <p>
                 <a
                   href="mailto:info@nexusliving.com"
-                  className="hover:text-primary"
+                  className="hover:text-accent transition-colors"
                 >
                   info@nexusliving.com
                 </a>
@@ -120,13 +128,15 @@ const Footer = () => {
 
           {/* Social Media */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
+            <h3 className="text-lg font-semibold uppercase tracking-wider mb-4">
+              Follow Us
+            </h3>
             <div className="flex space-x-4">
               {socialLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
-                  className="text-gray-400 hover:text-primary transition-colors"
+                  className="text-primary-content/80 hover:text-accent transition-colors"
                 >
                   <span className="sr-only">{link.name}</span>
                   {link.icon}
@@ -136,7 +146,7 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="mt-12 border-t border-gray-700 pt-8 text-center text-gray-500">
+        <div className="mt-12 border-t border-primary-content/20 pt-8 text-center text-primary-content/60">
           <p>
             &copy; {new Date().getFullYear()} Nexus Living. All Rights Reserved.
           </p>

@@ -36,7 +36,7 @@ const Banner = () => {
   }, [slides.length]);
 
   return (
-    <div className="relative w-full h-[60vh] md:h-[80vh] overflow-hidden">
+    <div className="relative w-full h-screen overflow-hidden">
       {slides.map((slide, index) => (
         <div
           key={index}
@@ -49,24 +49,34 @@ const Banner = () => {
             alt={slide.title}
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center text-white p-4">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4">
-              {slide.title}
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl">{slide.subtitle}</p>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/40 to-transparent"></div>
         </div>
       ))}
-      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentSlide(index)}
-            className={`w-3 h-3 rounded-full transition-colors ${
-              index === currentSlide ? 'bg-white' : 'bg-gray-400 hover:bg-gray-200'
-            }`}
-          ></button>
-        ))}
+      <div className="relative z-10 flex flex-col justify-center items-center text-center text-white h-full p-4">
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 drop-shadow-2xl animate-fade-in-down">
+          {slides[currentSlide].title}
+        </h1>
+        <p className="text-lg md:text-xl lg:text-2xl max-w-3xl mx-auto drop-shadow-xl animate-fade-in-up">
+          {slides[currentSlide].subtitle}
+        </p>
+      </div>
+      <div className="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center flex-col z-10">
+        <div className="flex space-x-3 mb-3">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSlide(index)}
+                className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                  index === currentSlide ? 'bg-white' : 'bg-white/50 hover:bg-white'
+                }`}
+              ></button>
+            ))}
+        </div>
+        <div className="text-white animate-bounce mt-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
+            </svg>
+        </div>
       </div>
     </div>
   );
@@ -96,7 +106,7 @@ const Coupons = ({ isModalOpen, setIsModalOpen }) => {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 right-8 bg-primary hover:bg-accent text-white p-4 rounded-full shadow-2xl z-50 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+        className="fixed bottom-8 right-8 bg-accent hover:bg-accent text-white p-4 rounded-full shadow-2xl z-50 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
         aria-label="View Exclusive Coupons"
       >
         <svg
@@ -156,7 +166,7 @@ const Coupons = ({ isModalOpen, setIsModalOpen }) => {
                     {coupon.title}
                   </h3>
                   <p className="text-gray-600 mb-4">{coupon.description}</p>
-                  <div className="bg-primary text-white py-2 px-4 rounded-lg font-bold tracking-widest">
+                  <div className="bg-accent text-white py-2 px-4 rounded-lg font-bold tracking-widest">
                     Code: {coupon.code}
                   </div>
                 </div>
@@ -318,106 +328,107 @@ function Home() {
   return (
     <div>
       <Banner />
-      <div className="container mx-auto px-4 py-12">
-        {/* Welcome Section */}
-        <section className="text-center">
-          <h2 className="text-4xl font-bold mb-4">Welcome to Nexus Living</h2>
-          <p className="text-lg text-base-content max-w-3xl mx-auto">
-            Discover a new standard of living where luxury meets convenience. Our
-            apartments offer breathtaking views, modern designs, and a vibrant
-            community. Your new home awaits.
-          </p>
-        </section>
-
-        {/* About the Building Section */}
-        <section className="mt-16 bg-gray-100 p-8 rounded-lg shadow-lg">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-primary mb-4">
-              About the Building
+      
+      <div className="container mx-auto px-4 py-16 sm:py-24">
+        
+        <section className="space-y-16">
+          <div className="text-center max-w-3xl mx-auto">
+            <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Building Features</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+              A Lifestyle, Not Just a Residence
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Nexus Living is a modern residential complex designed to provide
-              unparalleled comfort and luxury. With state-of-the-art amenities,
-              eco-friendly architecture, and a vibrant community, it’s more than
-              just a place to live—it’s a lifestyle.
+            <p className="text-lg text-gray-600">
+              Discover a new standard of urban living where modern design,
+              exclusive amenities, and a prime location converge to create an
+              unparalleled lifestyle.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="flex flex-col items-center text-center">
+
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="rounded-xl shadow-2xl overflow-hidden h-96">
               <img
-                src="https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=600"
+                src="https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                 alt="Modern Architecture"
-                className="w-full h-64 object-cover rounded-lg shadow-md"
+                className="w-full h-full object-cover"
               />
-              <h3 className="text-2xl font-semibold mt-4">Modern Architecture</h3>
-              <p className="text-gray-600 mt-2">
-                Designed with sleek, contemporary lines and eco-friendly materials,
-                our building stands as a beacon of modern living.
+            </div>
+            <div className="text-left">
+              <h3 className="text-3xl font-bold text-secondary mb-3">
+                Innovative Design
+              </h3>
+              <p className="text-gray-600 text-xl leading-relaxed">
+                Designed with sleek, contemporary lines and eco-friendly materials, our building stands as a beacon of modern living. Every detail, from the floor-to-ceiling windows that flood each apartment with natural light to the sustainably sourced finishes, has been thoughtfully considered. Each space is meticulously crafted for unparalleled comfort, timeless style, and a commitment to sustainability.
               </p>
             </div>
-            <div className="flex flex-col items-center text-center">
+          </div>
+
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
+            <div className="md:order-2 rounded-xl shadow-2xl overflow-hidden h-96">
               <img
-                src="https://images.pexels.com/photos/259950/pexels-photo-259950.jpeg?auto=compress&cs=tinysrgb&w=600"
+                src="https://images.pexels.com/photos/259950/pexels-photo-259950.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
                 alt="Luxury Amenities"
-                className="w-full h-64 object-cover rounded-lg shadow-md"
+                className="w-full h-full object-cover"
               />
-              <h3 className="text-2xl font-semibold mt-4">Luxury Amenities</h3>
-              <p className="text-gray-600 mt-2">
-                Enjoy access to a rooftop pool, fitness center, co-working spaces,
-                and more, all designed to enhance your lifestyle.
+            </div>
+            <div className="md:order-1 text-left">
+              <h3 className="text-3xl font-bold text-secondary mb-3">
+                Exclusive Amenities
+              </h3>
+              <p className="text-gray-600 text-xl leading-relaxed">
+                Enjoy access to a rooftop pool with panoramic city views, a state-of-the-art fitness center equipped with the latest technology, and serene resident lounges perfect for work or relaxation. Our exclusive co-working spaces are designed to enhance your productivity, while the landscaped gardens provide a tranquil escape from the urban energy.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Location Section */}
-        <section className="mt-16">
-          <div className="text-center mb-8">
-            <h2 className="text-4xl font-bold text-primary mb-4">
-              Prime Location
+        
+        <section className="mt-24">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Our Location</p>
+            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
+              In the Heart of the City
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Conveniently located in the heart of the city, with easy access to
-              public transport, shopping, and entertainment.
-            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-base-200 p-8 rounded-lg shadow-lg">
-            <div>
-              <h3 className="text-2xl font-semibold mb-4">Nexus Living</h3>
-              <p className="text-lg mb-2">
-                123 Nexus Avenue, Urbanopolis, 12345
-              </p>
-              <p className="text-gray-600 mb-4">
-                Our central location means you're just minutes away from major
-                business hubs, fine dining, and cultural landmarks. The nearby
-                metro station and bus stops make commuting a breeze.
-              </p>
-              <a
-                href="https://www.google.com/maps/search/?api=1&query=40.7128,-74.0060"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-accent text-accent-content hover:bg-accent-focus transition-colors mt-4"
-              >
-                Get Directions
-              </a>
-            </div>
-            <div className={`h-80 md:h-96 rounded-lg overflow-hidden shadow-md relative ${isModalOpen ? 'z-0' : 'z-10'}`}>
-              <MapContainer
-                center={[40.7128, -74.006]}
-                zoom={14}
-                scrollWheelZoom={false}
-                style={{ height: '100%', width: '100%' }}
-              >
-                <TileLayer
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
-                <Marker position={[40.7128, -74.006]}>
-                  <Popup>
-                    Nexus Living <br /> 123 Nexus Avenue
-                  </Popup>
-                </Marker>
-              </MapContainer>
+          <div className="bg-base-200 rounded-2xl p-8 md:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12 items-center">
+              <div className="lg:col-span-2 text-left">
+                <p className="text-lg text-gray-600 mb-6">
+                  Conveniently located with easy access to public transport,
+                  fine dining, and cultural landmarks. Everything you need is
+                  just moments away.
+                </p>
+                <p className="font-semibold text-secondary mb-2">
+                  123 Nexus Avenue, Urbanopolis, 12345
+                </p>
+                <a
+                  href="https://www.google.com/maps/search/?api=1&query=40.7128,-74.0060"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-accent text-base-100 hover:bg-accent-focus transition-colors mt-4"
+                >
+                  Explore the Neighborhood
+                </a>
+              </div>
+              <div className={`lg:col-span-3 h-80 md:h-[400px] rounded-xl overflow-hidden shadow-xl relative ${isModalOpen ? 'z-0' : 'z-10'}`}>
+                <MapContainer
+                  center={[40.7128, -74.006]}
+                  zoom={14}
+                  scrollWheelZoom={false}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <Marker position={[40.7128, -74.006]}>
+                    <Popup>
+                      Nexus Living <br /> 123 Nexus Avenue
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
             </div>
           </div>
         </section>
@@ -425,7 +436,6 @@ function Home() {
         {/* Coupons Section */}
         <Coupons isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       </div>
-      <Footer />
     </div>
   );
 }

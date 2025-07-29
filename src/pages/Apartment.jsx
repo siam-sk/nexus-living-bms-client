@@ -65,7 +65,7 @@ const ApartmentCard = ({ apartment }) => {
         </div>
         <p className="text-xl font-bold text-primary">Rent: ${rent}/month</p>
         <div className="card-actions justify-end mt-4">
-          <button onClick={handleAgreement} className="btn btn-primary">Agreement</button>
+          <button onClick={handleAgreement} className="btn btn-accent text-base-100">Agreement</button>
         </div>
       </div>
     </div>
@@ -95,6 +95,7 @@ const Apartment = () => {
     keepPreviousData: true,
   });
 
+  
   const apartments = data?.apartments || [];
   const count = data?.count || 0;
 
@@ -134,7 +135,7 @@ const Apartment = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-12">
+    <div className="container mx-auto px-4 py-12 pt-20">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-bold text-primary">
           Available Apartments
