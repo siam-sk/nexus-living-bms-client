@@ -72,8 +72,7 @@ const Banner = () => {
   );
 };
 
-const Coupons = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const Coupons = ({ isModalOpen, setIsModalOpen }) => {
   const coupons = [
     {
       title: '10% Off First Month',
@@ -97,7 +96,7 @@ const Coupons = () => {
       {/* Floating Action Button */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="fixed bottom-8 right-8 bg-primary hover:bg-secondary text-white p-4 rounded-full shadow-2xl z-50 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
+        className="fixed bottom-8 right-8 bg-primary hover:bg-accent text-white p-4 rounded-full shadow-2xl z-50 transition-transform transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary"
         aria-label="View Exclusive Coupons"
       >
         <svg
@@ -314,6 +313,8 @@ const Footer = () => {
 };
 
 function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div>
       <Banner />
@@ -395,12 +396,12 @@ function Home() {
                 href="https://www.google.com/maps/search/?api=1&query=40.7128,-74.0060"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn btn-primary"
+                className="btn btn-accent text-accent-content hover:bg-accent-focus transition-colors mt-4"
               >
                 Get Directions
               </a>
             </div>
-            <div className="h-80 md:h-96 rounded-lg overflow-hidden shadow-md">
+            <div className={`h-80 md:h-96 rounded-lg overflow-hidden shadow-md relative ${isModalOpen ? 'z-0' : 'z-10'}`}>
               <MapContainer
                 center={[40.7128, -74.006]}
                 zoom={14}
@@ -422,8 +423,9 @@ function Home() {
         </section>
 
         {/* Coupons Section */}
-        <Coupons />
+        <Coupons isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       </div>
+      <Footer />
     </div>
   );
 }
