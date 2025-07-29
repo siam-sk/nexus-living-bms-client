@@ -25,10 +25,10 @@ export const router = createBrowserRouter([
         element: <Root />,
         errorElement: <NotFound />,
         children: [
-            { path: '/', element: <Home /> },
-            { path: '/login', element: <Login /> },
-            { path: '/register', element: <Register /> },
-            { path: '/apartment', element: <Apartment /> },
+            { path: '/', element: <Home />, handle: { title: 'Home' } },
+            { path: '/login', element: <Login />, handle: { title: 'Login' } },
+            { path: '/register', element: <Register />, handle: { title: 'Register' } },
+            { path: '/apartment', element: <Apartment />, handle: { title: 'Apartments' } },
         ],
     },
     {
@@ -36,23 +36,24 @@ export const router = createBrowserRouter([
         element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
         children: [
             // User & Member routes
-            { path: 'my-profile', element: <MyProfile /> },
-            { path: 'announcements', element: <Announcements /> },
+            { path: 'my-profile', element: <MyProfile />, handle: { title: 'My Profile' } },
+            { path: 'announcements', element: <Announcements />, handle: { title: 'Announcements' } },
             // Member only routes
-            { path: 'make-payment', element: <MakePayment /> },
-            { path: 'payment-history', element: <PaymentHistory /> },
-            { path: 'payment-gateway', element: <PaymentGateway /> },
+            { path: 'make-payment', element: <MakePayment />, handle: { title: 'Make Payment' } },
+            { path: 'payment-history', element: <PaymentHistory />, handle: { title: 'Payment History' } },
+            { path: 'payment-gateway', element: <PaymentGateway />, handle: { title: 'Payment' } },
             // Admin only routes
-            { path: 'admin-profile', element: <AdminRoute><AdminProfile /></AdminRoute> },
-            { path: 'manage-members', element: <AdminRoute><ManageMembers /></AdminRoute> },
-            { path: 'make-announcement', element: <AdminRoute><MakeAnnouncement /></AdminRoute> },
-            { path: 'agreement-requests', element: <AdminRoute><AgreementRequests /></AdminRoute> },
-            { path: 'manage-coupons', element: <AdminRoute><ManageCoupons /></AdminRoute> },
+            { path: 'admin-profile', element: <AdminRoute><AdminProfile /></AdminRoute>, handle: { title: 'Admin Profile' } },
+            { path: 'manage-members', element: <AdminRoute><ManageMembers /></AdminRoute>, handle: { title: 'Manage Members' } },
+            { path: 'make-announcement', element: <AdminRoute><MakeAnnouncement /></AdminRoute>, handle: { title: 'Make Announcement' } },
+            { path: 'agreement-requests', element: <AdminRoute><AgreementRequests /></AdminRoute>, handle: { title: 'Agreement Requests' } },
+            { path: 'manage-coupons', element: <AdminRoute><ManageCoupons /></AdminRoute>, handle: { title: 'Manage Coupons' } },
         ],
     },
     // 404 pages
     {
         path: '*',
-        element: <NotFound />
+        element: <NotFound />,
+        handle: { title: 'Page Not Found' }
     }
 ]);

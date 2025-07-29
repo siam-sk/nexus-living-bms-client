@@ -3,8 +3,10 @@ import { useContext, useState } from 'react';
 import { AuthContext } from '../contexts/AuthProvider';
 import useAdmin from '../hooks/useAdmin';
 import useMember from '../hooks/useMember';
+import usePageTitle from '../hooks/usePageTitle';
 
 const DashboardLayout = () => {
+    usePageTitle(); // Set page title dynamically
     const { user } = useContext(AuthContext);
     const [isAdmin, isAdminLoading] = useAdmin();
     const [isMember, isMemberLoading] = useMember();

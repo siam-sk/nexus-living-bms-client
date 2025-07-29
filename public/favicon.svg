@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(100, 100)">
+        <g transform="scale(0.9)">
+            <!-- Hexagon Frame -->
+            <path
+                d="M 0 -100 L 86.6 -50 L 86.6 50 L 0 100 L -86.6 50 L -86.6 -50 Z"
+                fill="#34495E"
+            />
+            <!-- House Icon -->
+            <g fill="#FFFFFF">
+                <!-- Roof -->
+                <path d="M -50 -15 L 0 -55 L 50 -15 Z" />
+                <!-- Base -->
+                <path d="M -40 -15 L -40 50 L 40 50 L 40 -15 Z" />
+                <!-- Door -->
+                <path d="M -10 50 L -10 20 L 10 20 L 10 50 Z" fill="#34495E" fill-opacity="0.5" />
+            </g>
+        </g>
+    </g>
+</svg>
