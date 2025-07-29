@@ -21,6 +21,7 @@ const ApartmentCard = ({ apartment }) => {
         apartment_no,
         rent,
         status: 'pending',
+        request_date: new Date(),
       };
 
       fetch('http://localhost:5000/agreements', {
