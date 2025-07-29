@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 const AnnouncementCard = ({ announcement }) => {
     const { title, content, date, type } = announcement;
 
@@ -23,7 +25,7 @@ const AnnouncementCard = ({ announcement }) => {
                 <div>
                     <h2 className="card-title">{title}</h2>
                     <p className="text-base-content/80">{content}</p>
-                    <p className="text-xs text-base-content/60 mt-2">{date}</p>
+                    <p className="text-xs text-base-content/60 mt-2">{new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
             </div>
         </div>
@@ -32,24 +34,40 @@ const AnnouncementCard = ({ announcement }) => {
 
 
 const Announcements = () => {
-    const announcements = [
-        { id: 1, title: 'Scheduled Maintenance', content: 'The swimming pool will be closed for maintenance on July 31st.', date: 'July 28, 2025', type: 'maintenance' },
-        { id: 2, title: 'Community BBQ', content: 'Join us for a community BBQ this Saturday at 6 PM in the common area.', date: 'July 27, 2025', type: 'event' },
-        { id: 3, title: 'Package Delivery Update', content: 'Please pick up your packages from the front desk within 48 hours of notification.', date: 'July 26, 2025', type: 'info' },
-    ];
+    const [announcements, setAnnouncements] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('http://localhost:5000/announcements')
+            .then(res => res.json())
+            .then(data => {
+                setAnnouncements(data);
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error("Failed to fetch announcements:", error);
+                setLoading(false);
+            });
+    }, []);
 
     return (
         <div>
             <h1 className="text-4xl font-bold text-primary mb-8">Announcements</h1>
-            <div className="space-y-6">
-                {announcements.length > 0 ? (
-                    announcements.map(announcement => (
-                        <AnnouncementCard key={announcement.id} announcement={announcement} />
-                    ))
-                ) : (
-                    <p>No announcements at this time.</p>
-                )}
-            </div>
+            {loading ? (
+                <div className="flex justify-center items-center h-64">
+                    <span className="loading loading-spinner loading-lg text-primary"></span>
+                </div>
+            ) : (
+                <div className="space-y-6">
+                    {announcements.length > 0 ? (
+                        announcements.map(announcement => (
+                            <AnnouncementCard key={announcement._id} announcement={announcement} />
+                        ))
+                    ) : (
+                        <p>No announcements at this time.</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
