@@ -39,6 +39,31 @@ Nexus Living is a full-stack web application designed to streamline the manageme
 
 ---
 
+## Project Showcase
+
+<table>
+  <tr>
+    <td align="center"><strong>Home Page</strong></td>
+  </tr>
+  <tr>
+    <td><img src="./public/ss1.jpg" alt="Home Page Screenshot"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Admin Dashboard</strong></td>
+  </tr>
+  <tr>
+    <td><img src="./public/ss2.png" alt="Admin Dashboard Screenshot"></td>
+  </tr>
+   <tr>
+    <td align="center"><strong>Coupon Page</strong></td>
+  </tr>
+  <tr>
+    <td><img src="./public/ss3.png" alt="Coupon Screenshot"></td>
+  </tr>
+</table>
+
+---
+
 ## Technology Stack & Key Packages
 
 This project is built with the MERN stack and utilizes several modern libraries for a robust and efficient user experience.
@@ -127,4 +152,4 @@ npm run dev
 **Post-Deployment Configuration:**
 1.  Add the deployed Vercel server URL to the `cors` options in `index.js`.
 2.  Add the deployed Vercel server URL to the **Authorized domains** in your Firebase Authentication settings.
-3.  Create a `.env.production` file in the client directory with `VITE_API_URL` pointing to your Vercel server URL before
+3.  Create a `.env.production` file in the client directory with `VITE_API_URL` pointing to your Vercel server URL before building
