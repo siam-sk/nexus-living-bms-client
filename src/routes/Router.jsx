@@ -18,6 +18,7 @@ import PrivateRoute from './PrivateRoute';
 import AdminRoute from './AdminRoute';
 import PaymentGateway from '../pages/dashboard/PaymentGateway';
 import NotFound from '../pages/NotFound';
+import Overview from '../pages/dashboard/Overview';
 
 export const router = createBrowserRouter([
     {
@@ -33,8 +34,13 @@ export const router = createBrowserRouter([
     },
     {
         path: '/dashboard',
-        element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
+        element: <DashboardLayout />,
         children: [
+            {
+                path: 'overview',
+                element: <Overview />,
+                handle: { title: 'Overview' }
+            },
             {
                 path: 'my-profile',
                 element: <MyProfile />,

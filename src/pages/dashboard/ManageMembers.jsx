@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import ResponsiveTable from '../../components/ResponsiveTable';
 
 const ManageMembers = () => {
     const axiosSecure = useAxiosSecure();
@@ -68,42 +69,27 @@ const ManageMembers = () => {
     return (
         <div>
             <h1 className="text-4xl font-bold text-primary mb-8">Manage Members</h1>
-            <div className="overflow-x-auto bg-base-100 rounded-lg shadow-md">
-                <table className="table">
-                    <thead className="bg-base-200">
-                        <tr>
-                            <th></th>
-                            <th>User Name</th>
-                            <th>User Email</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {members.length > 0 ? (
-                            members.map((member, index) => (
-                                <tr key={member._id} className="hover">
-                                    <th>{index + 1}</th>
-                                    <td>{member.name}</td>
-                                    <td>{member.email}</td>
-                                    <td>
-                                        <button
-                                            onClick={() => handleRemoveMember(member._id)}
-                                            className="btn btn-error btn-sm text-white"
-                                            disabled={mutation.isPending}
-                                        >
-                                            Remove
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan="4" className="text-center py-4">No members found.</td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+
+            <ResponsiveTable
+                columns={[
+                    { header: '#', accessor: (_row, i) => i + 1 },
+                    { header: 'User Name', accessor: (row) => row.name },
+                    { header: 'User Email', accessor: (row) => <span className="break-all">{row.email}</span> },
+                ]}
+                data={members || []}
+                rowKey={(row) => row._id}
+                actionsHeader="Action"
+                renderActions={(row) => (
+                    <button
+                        onClick={() => handleRemoveMember(row._id)}
+                        className="btn btn-error btn-sm text-white"
+                        disabled={mutation.isPending}
+                    >
+                        Remove
+                    </button>
+                )}
+                emptyMessage="No members found."
+            />
         </div>
     );
 };

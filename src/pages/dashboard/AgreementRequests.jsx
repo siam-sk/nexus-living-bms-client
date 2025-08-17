@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import ResponsiveTable from '../../components/ResponsiveTable';
 
 const AgreementRequests = () => {
     const queryClient = useQueryClient();
@@ -51,39 +52,38 @@ const AgreementRequests = () => {
     return (
         <div>
             <h1 className="text-4xl font-bold text-primary mb-8">Agreement Requests</h1>
-            <div className="overflow-x-auto bg-base-100 rounded-lg shadow-md">
-                <table className="table table-zebra">
-                    <thead className="bg-base-200">
-                        <tr>
-                            <th>User Name</th>
-                            <th>User Email</th>
-                            <th>Apartment Info</th>
-                            <th>Rent</th>
-                            <th>Request Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {requests.length > 0 ? (
-                            requests.map((req) => (
-                                <tr key={req._id}>
-                                    <td>{req.user_name}</td>
-                                    <td>{req.user_email}</td>
-                                    <td>Block: {req.block_name}, Floor: {req.floor_no}, Room: {req.apartment_no}</td>
-                                    <td>${req.rent}</td>
-                                    <td>{new Date(req.request_date).toLocaleDateString()}</td>
-                                    <td className="space-x-2">
-                                        <button onClick={() => handleAccept(req._id)} className="btn btn-success btn-sm text-white" disabled={acceptMutation.isPending}>Accept</button>
-                                        <button onClick={() => handleReject(req._id)} className="btn btn-error btn-sm text-white" disabled={rejectMutation.isPending}>Reject</button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr><td colSpan="6" className="text-center py-4">No pending agreement requests.</td></tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+
+            <ResponsiveTable
+                columns={[
+                    { header: 'User Name', accessor: (row) => row.user_name },
+                    { header: 'User Email', accessor: (row) => <span className="break-all">{row.user_email}</span> },
+                    { header: 'Apartment Info', accessor: (row) => <>Block: {row.block_name}, Floor: {row.floor_no}, Room: {row.apartment_no}</> },
+                    { header: 'Rent', accessor: (row) => `$${row.rent}` },
+                    { header: 'Request Date', accessor: (row) => new Date(row.request_date).toLocaleDateString() },
+                ]}
+                data={requests || []}
+                rowKey={(row) => row._id}
+                actionsHeader="Actions"
+                renderActions={(row) => (
+                    <>
+                        <button
+                            onClick={() => handleAccept(row._id)}
+                            className="btn btn-success btn-sm text-white"
+                            disabled={acceptMutation.isPending}
+                        >
+                            Accept
+                        </button>
+                        <button
+                            onClick={() => handleReject(row._id)}
+                            className="btn btn-error btn-sm text-white"
+                            disabled={rejectMutation.isPending}
+                        >
+                            Reject
+                        </button>
+                    </>
+                )}
+                emptyMessage="No requests found."
+            />
         </div>
     );
 };

@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
+import ResponsiveTable from '../../components/ResponsiveTable';
 
 const ManageCoupons = () => {
     const queryClient = useQueryClient();
@@ -48,10 +49,10 @@ const ManageCoupons = () => {
     });
 
     const onSubmit = (data) => {
-        // Convert percentage to a number
         const couponData = {
-            ...data,
+            code: (data.code || '').trim().toUpperCase(),
             discount_percentage: parseInt(data.discount_percentage, 10),
+            description: data.description,
         };
         addCouponMutation.mutate(couponData);
     };
@@ -67,49 +68,38 @@ const ManageCoupons = () => {
         <div>
             <div className="flex justify-between items-center mb-8">
                 <h1 className="text-4xl font-bold text-primary">Manage Coupons</h1>
-                <button className="btn btn-primary" onClick={() => document.getElementById('add_coupon_modal').showModal()}>Add Coupon</button>
+                <button className="btn btn-primary" onClick={() => document.getElementById('add_coupon_modal').showModal()}>
+                    Add Coupon
+                </button>
             </div>
 
-            <div className="overflow-x-auto bg-base-100 rounded-lg shadow-md">
-                <table className="table">
-                    <thead className="bg-base-200">
-                        <tr>
-                            <th>Coupon Code</th>
-                            <th>Discount Percentage</th>
-                            <th>Description</th>
-                            <th>Availability</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {coupons.length > 0 ? (
-                            coupons.map((coupon) => (
-                                <tr key={coupon._id} className="hover">
-                                    <td className="font-mono bg-base-200 text-accent font-bold">{coupon.coupon_code}</td>
-                                    <td>{coupon.discount_percentage}%</td>
-                                    <td>{coupon.description}</td>
-                                    <td>
-                                        <span className={`badge ${coupon.availability === 'available' ? 'badge-success' : 'badge-error'}`}>
-                                            {coupon.availability}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button 
-                                            onClick={() => handleToggleAvailability(coupon._id)}
-                                            className={`btn btn-sm ${coupon.availability === 'available' ? 'btn-warning' : 'btn-info'}`}
-                                            disabled={toggleAvailabilityMutation.isPending}
-                                        >
-                                            {coupon.availability === 'available' ? 'Make Unavailable' : 'Make Available'}
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))
-                        ) : (
-                            <tr><td colSpan="5" className="text-center py-4">No coupons found. Add one to get started!</td></tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
+            <ResponsiveTable
+                columns={[
+                    { header: 'Coupon Code', accessor: (row) => <span className="font-mono">{row.code}</span> },
+                    { header: 'Discount (%)', accessor: (row) => `${row.discount_percentage}%` },
+                    { header: 'Description', accessor: (row) => row.description },
+                    { header: 'Availability', accessor: (row) => (
+                        <span className={`badge ${row.availability === 'available' ? 'badge-success' : 'badge-ghost'}`}>
+                          {row.availability}
+                        </span>
+                    ) },
+                ]}
+                data={coupons || []}
+                rowKey={(row) => row._id}
+                actionsHeader="Action"
+                renderActions={(row) => (
+                    <>
+                        <button
+                            onClick={() => handleToggleAvailability(row._id)}
+                            className="btn btn-secondary btn-sm"
+                            disabled={toggleAvailabilityMutation.isPending}
+                        >
+                            Toggle
+                        </button>
+                    </>
+                )}
+                emptyMessage="No coupons found."
+            />
 
             {/* Add Coupon Modal */}
             <dialog id="add_coupon_modal" className="modal">
@@ -121,7 +111,11 @@ const ManageCoupons = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         <div className="form-control">
                             <label className="label"><span className="label-text">Coupon Code</span></label>
-                            <input type="text" {...register('coupon_code', { required: true })} className={`input input-bordered ${errors.coupon_code ? 'input-error' : ''}`} />
+                            <input
+                              type="text"
+                              {...register('code', { required: true })}
+                              className={`input input-bordered ${errors.code ? 'input-error' : ''}`}
+                            />
                         </div>
                         <div className="form-control">
                             <label className="label"><span className="label-text">Discount Percentage (%)</span></label>
