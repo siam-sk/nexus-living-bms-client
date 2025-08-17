@@ -1,53 +1,33 @@
 import axios from 'axios';
-import { useContext } from 'react';
-import { useNavigate } from 'react-router';
-import { AuthContext } from '../contexts/AuthProvider';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import app from '../firebase/firebase.config';
-
-const auth = getAuth(app);
+import { getAuth } from 'firebase/auth';
+import app from '../firebase/firebase.config'; // adjust path if different
 
 const axiosSecure = axios.create({
-    baseURL: import.meta.env.VITE_API_URL
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000',
+  withCredentials: true,
 });
 
-const useAxiosSecure = () => {
-    const navigate = useNavigate();
-    const { logOut } = useContext(AuthContext);
+// Attach fresh Firebase ID token on every request
+axiosSecure.interceptors.request.use(async (config) => {
+  const auth = getAuth(app);
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    const token = await currentUser.getIdToken(); // cached; no force refresh
+    config.headers.Authorization = `Bearer ${token}`;
+  } else {
+    delete config.headers.Authorization;
+  }
+  return config;
+});
 
-    
-    axiosSecure.interceptors.request.use(function (config) {
-        return new Promise((resolve) => {
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    user.getIdToken().then(token => {
-                        config.headers.authorization = `Bearer ${token}`;
-                        resolve(config);
-                    });
-                } else {
-                    resolve(config);
-                }
-            });
-        });
-    }, function (error) {
-        return Promise.reject(error);
-    });
+// Do not hard-redirect on 401/403; let pages handle it
+axiosSecure.interceptors.response.use(
+  (res) => res,
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
-
-    
-    axiosSecure.interceptors.response.use(function (response) {
-        return response;
-    }, async (error) => {
-        const status = error.response?.status;
-        
-        if (status === 401 || status === 403) {
-            await logOut();
-            navigate('/login');
-        }
-        return Promise.reject(error);
-    });
-
-    return axiosSecure;
-};
-
-export default useAxiosSecure;
+export default function useAxiosSecure() {
+  return axiosSecure;
+}

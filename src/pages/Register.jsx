@@ -73,52 +73,25 @@ const Register = () => {
       <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
         <form onSubmit={handleRegister} className="card-body">
           <h1 className="text-3xl font-bold text-center">Register now!</h1>
+
           <div className="form-control">
-            <label className="label">
-              <span className="label-text">Name</span>
-            </label>
-            <input
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              className="input input-bordered"
-              required
-            />
+            <label className="label"><span className="label-text">Name</span></label>
+            <input type="text" name="name" placeholder="Your Name" className="input input-bordered w-full" required />
           </div>
+
           <div className="form-control">
-            <label className="label">
-              <span className="label-text">Photo URL</span>
-            </label>
-            <input
-              type="text"
-              name="photoURL"
-              placeholder="Your Photo URL (Optional)"
-              className="input input-bordered"
-            />
+            <label className="label"><span className="label-text">Photo URL</span></label>
+            <input type="text" name="photoURL" placeholder="Your Photo URL (Optional)" className="input input-bordered w-full" />
           </div>
+
           <div className="form-control">
-            <label className="label">
-              <span className="label-text">Email</span>
-            </label>
-            <input
-              type="email"
-              name="email"
-              placeholder="email"
-              className="input input-bordered"
-              required
-            />
+            <label className="label"><span className="label-text">Email</span></label>
+            <input type="email" name="email" placeholder="email" className="input input-bordered w-full" required />
           </div>
+
           <div className="form-control">
-            <label className="label">
-              <span className="label-text">Password</span>
-            </label>
-            <input
-              type="password"
-              name="password"
-              placeholder="password"
-              className="input input-bordered"
-              required
-            />
+            <label className="label"><span className="label-text">Password</span></label>
+            <input type="password" name="password" placeholder="password" className="input input-bordered w-full" required />
             {passwordError && (
               <label className="label">
                 <span className="label-text-alt text-error">
@@ -127,16 +100,13 @@ const Register = () => {
               </label>
             )}
           </div>
+
           <div className="form-control mt-6">
-            <button type="submit" className="btn btn-primary">
-              Register
-            </button>
+            <button type="submit" className="btn btn-primary w-full">Register</button>
           </div>
+
           <p className="text-center mt-4">
-            Already have an account?{' '}
-            <Link to="/login" className="link link-primary">
-              Login here
-            </Link>
+            Already have an account? <Link to="/login" className="link link-primary">Login here</Link>
           </p>
         </form>
       </div>
