@@ -2,14 +2,14 @@ import { useContext, useState, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router';
 import { AuthContext } from '../contexts/AuthProvider';
 import useAdmin from '../hooks/useAdmin';
+import useMember from '../hooks/useMember'; 
 
 const Navbar = () => {
     const { user, logOut } = useContext(AuthContext);
     const [isAdmin] = useAdmin();
+    const [isMember] = useMember();
     const location = useLocation();
     const [isScrolled, setIsScrolled] = useState(false);
-
-    const dashboardPath = isAdmin ? '/dashboard/admin-profile' : '/dashboard/my-profile';
 
     const onHomePage = location.pathname === '/';
 
@@ -107,9 +107,40 @@ const Navbar = () => {
                                         <img alt="User Profile" src={user.photoURL || 'https://i.ibb.co/1zShS2c/default-avatar-icon-of-social-media-user-vector.jpg'} />
                                     </div>
                                 </label>
+                                
                                 <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu dropdown-content bg-base-100 rounded-box w-52 text-base">
-                                    <li className="p-2 font-semibold">{user.displayName || 'User'}</li>
-                                    <li><Link to={dashboardPath}>Dashboard</Link></li>
+                                    <li className="p-2 font-semibold border-b mb-2">{user.displayName || 'User'}</li>
+                                    
+                                    {/* Admin Links */}
+                                    {isAdmin && (
+                                        <>
+                                            <li><Link to="/dashboard/admin-profile">Admin Profile</Link></li>
+                                            <li><Link to="/dashboard/manage-members">Manage Members</Link></li>
+                                            <li><Link to="/dashboard/agreement-requests">Agreement Requests</Link></li>
+                                            <li><Link to="/dashboard/manage-coupons">Manage Coupons</Link></li>
+                                            <li><Link to="/dashboard/make-announcement">Make Announcement</Link></li>
+                                        </>
+                                    )}
+
+                                    {/* Member Links */}
+                                    {isMember && !isAdmin && (
+                                        <>
+                                            <li><Link to="/dashboard/my-profile">My Profile</Link></li>
+                                            <li><Link to="/dashboard/make-payment">Make Payment</Link></li>
+                                            <li><Link to="/dashboard/payment-history">Payment History</Link></li>
+                                            <li><Link to="/dashboard/announcements">Announcements</Link></li>
+                                        </>
+                                    )}
+
+                                    {/* Regular User Links */}
+                                    {!isAdmin && !isMember && (
+                                        <>
+                                            <li><Link to="/dashboard/my-profile">My Profile</Link></li>
+                                            <li><Link to="/dashboard/announcements">Announcements</Link></li>
+                                        </>
+                                    )}
+
+                                    <div className="divider my-1"></div>
                                     <li>
                                         <button onClick={handleLogout} className="btn btn-ghost justify-start">Logout</button>
                                     </li>
