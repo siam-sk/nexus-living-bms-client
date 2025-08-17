@@ -1,5 +1,55 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { Link } from 'react-router';
+
+// --- Animation Hook ---
+// A custom hook to detect when an element is visible on screen
+const useScrollAnimation = () => {
+  const ref = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.1,
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
+  return [ref, isVisible];
+};
+
+// --- Reusable Animated Section Component ---
+const AnimatedSection = ({ children, className = '' }) => {
+  const [ref, isVisible] = useScrollAnimation();
+  return (
+    <section
+      ref={ref}
+      className={`transition-all duration-800 ease-out will-change-transform ${className} ${
+        isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+      }`}
+    >
+      {children}
+    </section>
+  );
+};
+
 
 const Banner = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -72,8 +122,8 @@ const Banner = () => {
               ></button>
             ))}
         </div>
-        <div className="text-white animate-bounce mt-4">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+        <div className="text-white animate-bounce mt-2">
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7" fill="none" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 5.25l-7.5 7.5-7.5-7.5m15 6l-7.5 7.5-7.5-7.5" />
             </svg>
         </div>
@@ -179,263 +229,486 @@ const Coupons = ({ isModalOpen, setIsModalOpen }) => {
   );
 };
 
-const Footer = () => {
-  const socialLinks = [
+// --- Compact stats strip ---
+const StatsStrip = () => (
+  <div className="rounded-2xl bg-base-100 shadow-xl border border-base-200">
+    <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-base-200">
+      {[
+        {
+          k: 'Occupancy',
+          v: '92%',
+          i: 'M3 12h18',
+        },
+        {
+          k: 'Available Units',
+          v: '18',
+          i: 'M3 3v18h18',
+        },
+        {
+          k: 'Residents',
+          v: '420+',
+          i: 'M16 7a4 4 0 11-8 0',
+        },
+        {
+          k: 'Avg. Rating',
+          v: '4.8',
+          i: 'M11.48 3.499a.562.562...',
+        },
+      ].map((s, idx) => (
+        <div key={idx} className="p-6 flex items-center gap-4">
+          <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            {/* Simple icon placeholder using SVG path */}
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke="currentColor" fill="none" className="w-6 h-6">
+              <path strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </div>
+          <div>
+            <div className="text-2xl font-bold text-primary">{s.v}</div>
+            <div className="text-sm text-base-content/70">{s.k}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// --- Feature grid (Amenities & Services only; no overlap with spaces) ---
+const FeatureGrid = () => {
+  const features = [
     {
-      name: 'Facebook',
-      href: '#',
-      icon: (
-        <svg
-          className="w-6 h-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            fillRule="evenodd"
-            d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
+      title: 'Smart Access',
+      desc: 'Keyless entry with guest passes and audit logs.',
+      icon: '🔐',
+      img: 'https://images.pexels.com/photos/5592501/pexels-photo-5592501.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      perks: ['Keyless', '24/7', 'Secure'],
+      from: 'from-secondary',
+      to: 'to-accent',
     },
     {
-      name: 'Instagram',
-      href: '#',
-      icon: (
-        <svg
-          className="w-6 h-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            fillRule="evenodd"
-            d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.012-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.08 2.525c.636-.247 1.363-.416 2.427-.465C9.53 2.013 9.884 2 12.315 2zM12 0C9.81 0 9.448.01 8.378.058c-1.11.05-1.9.226-2.594.48a6.897 6.897 0 00-2.52 1.61 6.897 6.897 0 00-1.61 2.52c-.254.694-.43 1.483-.48 2.594C.01 9.448 0 9.81 0 12s.01 2.552.058 3.622c.05 1.11.226 1.9.48 2.594a6.897 6.897 0 001.61 2.52 6.897 6.897 0 002.52 1.61c.694.254 1.483.43 2.594.48C9.448 23.99 9.81 24 12 24s2.552-.01 3.622-.058c1.11-.05 1.9-.226 2.594-.48a6.897 6.897 0 002.52-1.61 6.897 6.897 0 001.61-2.52c.254-.694.43-1.483.48-2.594C23.99 14.552 24 14.19 24 12s-.01-2.552-.058-3.622c-.05-1.11-.226-1.9-.48-2.594a6.897 6.897 0 00-1.61-2.52A6.897 6.897 0 0018.216.538c-.694-.254-1.483-.43-2.594-.48C14.552.01 14.19 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.88 1.44 1.44 0 000-2.88z"
-            clipRule="evenodd"
-          />
-        </svg>
-      ),
+      title: 'Concierge Desk',
+      desc: 'Resident-first support, packages, reservations.',
+      icon: '🤝',
+      img: 'https://images.pexels.com/photos/3771832/pexels-photo-3771832.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      perks: ['Packages', 'Maintenance', 'Tours'],
+      from: 'from-accent',
+      to: 'to-primary',
     },
     {
-      name: 'Twitter',
-      href: '#',
-      icon: (
-        <svg
-          className="w-6 h-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.71v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
-        </svg>
-      ),
+      title: 'Parcel Lockers',
+      desc: 'Self-serve deliveries with QR pickup.',
+      icon: '📦',
+      img: 'https://images.pexels.com/photos/6169062/pexels-photo-6169062.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      perks: ['24/7', 'Secure', 'Contactless'],
+      from: 'from-primary',
+      to: 'to-secondary',
+    },
+    {
+      title: '1 Gbps Fiber',
+      desc: 'Blazing-fast building-wide internet.',
+      icon: '📡',
+      img: 'https://images.pexels.com/photos/1054397/pexels-photo-1054397.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      perks: ['Wi‑Fi 6', 'Low latency', 'Unlimited'],
+      from: 'from-secondary',
+      to: 'to-accent',
+    },
+    {
+      title: '24/7 Maintenance',
+      desc: 'On-call technicians for quick fixes.',
+      icon: '🛠️',
+      img: 'https://images.pexels.com/photos/8961065/pexels-photo-8961065.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      perks: ['Emergency', 'Reliable', 'Certified'],
+      from: 'from-accent',
+      to: 'to-primary',
+    },
+    {
+      title: 'Resident App',
+      desc: 'Pay rent, book amenities, get updates.',
+      icon: '📱',
+      img: 'https://images.pexels.com/photos/6078128/pexels-photo-6078128.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      perks: ['Payments', 'Bookings', 'Alerts'],
+      from: 'from-primary',
+      to: 'to-secondary',
     },
   ];
 
   return (
-    <footer className="bg-gray-800 text-white mt-16">
-      <div className="container mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {/* About Section */}
-          <div className="md:col-span-2 lg:col-span-1">
-            <h3 className="text-2xl font-bold mb-4">Nexus Living</h3>
-            <p className="text-gray-400">
-              Experience unparalleled luxury and comfort in the heart of the
-              city. Your new home is waiting.
-            </p>
-          </div>
+    <div className="relative">
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-70">
+        <div className="h-full w-full bg-[radial-gradient(ellipse_at_top,rgba(99,102,241,0.06),transparent_60%),radial-gradient(ellipse_at_bottom,rgba(236,72,153,0.06),transparent_60%)]" />
+      </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">
-                  Home
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">
-                  Apartments
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">
-                  Amenities
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-primary transition-colors">
-                  Contact
-                </a>
-              </li>
-            </ul>
-          </div>
+      <div className="text-center max-w-3xl mx-auto mb-8">
+        <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Amenities & Services</p>
+        <h2 className="text-4xl font-bold text-primary">Designed Around You</h2>
+        <p className="text-base text-base-content/70 mt-2">Modern conveniences that simplify daily living.</p>
+      </div>
 
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <address className="not-italic text-gray-400 space-y-2">
-              <p>123 Nexus Avenue, Urbanopolis, 12345</p>
-              <p>
-                <a href="tel:+1234567890" className="hover:text-primary">
-                  (123) 456-7890
-                </a>
-              </p>
-              <p>
-                <a
-                  href="mailto:info@nexusliving.com"
-                  className="hover:text-primary"
-                >
-                  info@nexusliving.com
-                </a>
-              </p>
-            </address>
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {features.map((f, i) => (
+          <div
+            key={i}
+            className="group relative rounded-2xl overflow-hidden border border-base-200 bg-base-100 shadow-sm transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5"
+          >
+            <figure className="h-40 relative">
+              <img src={f.img} alt={f.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+              <div className="absolute inset-0 bg-gradient-to-t from-base-100 via-base-100/10 to-transparent"></div>
+              <div className={`absolute top-3 left-3 w-12 h-12 rounded-xl bg-gradient-to-br ${f.from} ${f.to} text-white grid place-content-center shadow-md ring-4 ring-black/10`}>
+                <span className="text-xl" aria-hidden>{f.icon}</span>
+              </div>
+            </figure>
 
-          {/* Social Media */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Follow Us</h3>
-            <div className="flex space-x-4">
-              {socialLinks.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  className="text-gray-400 hover:text-primary transition-colors"
-                >
-                  <span className="sr-only">{link.name}</span>
-                  {link.icon}
-                </a>
-              ))}
+            <div className="p-6 flex flex-col h-[220px]">
+              <h3 className="text-lg font-semibold">{f.title}</h3>
+              <p className="mt-1 text-base-content/70">{f.desc}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {f.perks.map((p, idx) => (
+                  <span key={idx} className="badge badge-outline border-base-300 text-base-content/70">{p}</span>
+                ))}
+              </div>
+              <div className="mt-auto pt-5 flex items-center justify-between">
+                <span className="text-xs text-base-content/60">Included services</span>
+                <Link to="/apartment" className="btn btn-ghost btn-sm text-primary gap-1">
+                  See more
+                  <svg className="w-4 h-4 transition-transform group-hover:translate-x-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="1.5">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25L21 12l-3.75 3.75M3 12h18" />
+                  </svg>
+                </Link>
+              </div>
+
+              <div className="pointer-events-none absolute -bottom-10 -right-10 w-40 h-40 rounded-full blur-2xl opacity-30 bg-gradient-to-br from-primary/20 to-secondary/20" />
             </div>
           </div>
-        </div>
-
-        <div className="mt-12 border-t border-gray-700 pt-8 text-center text-gray-500">
-          <p>
-            &copy; {new Date().getFullYear()} Nexus Living. All Rights Reserved.
-          </p>
-        </div>
+        ))}
       </div>
-    </footer>
+    </div>
   );
 };
 
+// --- Featured Apartments: horizontal snap slider ---
+const FeaturedApartments = () => {
+  const apartments = [
+    {
+      id: 1,
+      image:
+        'https://images.pexels.com/photos/164558/pexels-photo-164558.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      title: 'Skyline Loft',
+      description: '2-bed loft with panoramic city views.',
+    },
+    {
+      id: 2,
+      image:
+        'https://images.pexels.com/photos/271624/pexels-photo-271624.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      title: 'Garden Terrace',
+      description: '3-bed with private terrace & garden.',
+    },
+    {
+      id: 3,
+      image:
+        'https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      title: 'Urban Studio',
+      description: 'Chic studio for modern professionals.',
+    },
+    {
+      id: 4,
+      image:
+        'https://images.pexels.com/photos/439391/pexels-photo-439391.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      title: 'Corner Suite',
+      description: 'Light-filled corner two-bedroom.',
+    },
+  ];
+
+  const railRef = useRef(null);
+  useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+    let i = 0;
+    const id = setInterval(() => {
+      if (!rail) return;
+      i = (i + 1) % apartments.length;
+      const cardWidth = rail.firstChild?.getBoundingClientRect().width || 320;
+      rail.scrollTo({ left: i * (cardWidth + 16), behavior: 'smooth' });
+    }, 3500);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <div>
+      <div className="flex items-end justify-between mb-6">
+        <div>
+          <p className="text-secondary font-semibold tracking-widest uppercase">Our Apartments</p>
+          <h2 className="text-4xl font-bold text-primary">Featured Listings</h2>
+        </div>
+        <Link to="/apartment" className="btn btn-outline btn-secondary">Browse all</Link>
+      </div>
+
+      <div
+        ref={railRef}
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
+      >
+        {apartments.map((apt) => (
+          <div key={apt.id} className="min-w-[320px] max-w-[320px] snap-start">
+            <div className="card bg-base-100 border border-base-200 hover:shadow-xl transition-all duration-300">
+              <figure className="h-48">
+                <img src={apt.image} alt={apt.title} className="w-full h-full object-cover" />
+              </figure>
+              <div className="card-body">
+                <h3 className="card-title">{apt.title}</h3>
+                <p className="text-base-content/70">{apt.description}</p>
+                <div className="card-actions justify-end">
+                  <Link to="/apartment" className="btn btn-secondary btn-sm">See more</Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- Amenities mosaic (visual impact) ---
+const AmenitiesMosaic = () => {
+  const items = [
+    {
+      label: 'Rooftop Lounge',
+      img: 'https://images.pexels.com/photos/261187/pexels-photo-261187.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      span: 'col-span-2 row-span-2',
+    },
+    {
+      label: 'Fitness Studio',
+      img: 'https://images.pexels.com/photos/1954524/pexels-photo-1954524.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      span: '',
+    },
+    {
+      label: 'Green Courtyard',
+      img: 'https://images.pexels.com/photos/1115804/pexels-photo-1115804.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      span: '',
+    },
+    {
+      label: 'Co-working Pods',
+      img: 'https://images.pexels.com/photos/3184300/pexels-photo-3184300.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+      span: 'col-span-2',
+    },
+  ];
+  return (
+    <div>
+      <div className="text-center max-w-3xl mx-auto mb-10">
+        <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Lifestyle</p>
+        <h2 className="text-4xl font-bold text-primary">Spaces that Inspire</h2>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[160px] md:auto-rows-[180px] gap-4">
+        {items.map((it, idx) => (
+          <div key={idx} className={`${it.span} relative rounded-xl overflow-hidden group`}>
+            <img src={it.img} alt={it.label} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent opacity-70 group-hover:opacity-80 transition-opacity" />
+            <div className="absolute bottom-3 left-3 text-white font-semibold tracking-wide">
+              {it.label}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- Location (compact, clean) ---
+const LocationSection = () => (
+  <div className="bg-base-200 rounded-2xl p-6 md:p-8">
+    <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 items-center">
+      <div className="lg:col-span-2">
+        <p className="text-secondary font-semibold uppercase tracking-widest mb-2">Our Location</p>
+        <h3 className="text-3xl font-bold text-primary mb-3">In the Heart of the City</h3>
+        <p className="text-base-content/70 mb-4">
+          Steps from dining, culture, and transit. Everything you need is moments away.
+        </p>
+        <p className="font-semibold text-secondary">123 Nexus Avenue, Urbanopolis, 12345</p>
+        <a
+          href="https://www.google.com/maps/search/?api=1&query=40.7128,-74.0060"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn btn-accent mt-4"
+        >
+          Explore the neighborhood
+        </a>
+      </div>
+      <div className="lg:col-span-3 h-72 rounded-xl overflow-hidden shadow-xl">
+        <MapContainer center={[40.7128, -74.006]} zoom={14} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
+          <TileLayer attribution='&copy; OpenStreetMap contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <Marker position={[40.7128, -74.006]}>
+            <Popup>Nexus Living<br />123 Nexus Avenue</Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+    </div>
+  </div>
+);
+
+// --- Testimonials (auto-scroll, snap) ---
+const TestimonialsCarousel = () => {
+  const reviews = [
+    {
+      name: 'Jessica Miller',
+      role: 'Resident',
+      quote:
+        'Living at Nexus has been a dream. Amenities are top-notch and the team is incredibly responsive.',
+      avatar:
+        'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600&dpr=1',
+    },
+    {
+      name: 'David Chen',
+      role: 'Resident',
+      quote:
+        'Unbeatable location and an amazing community vibe. Highly recommended!',
+      avatar:
+        'https://images.pexels.com/photos/91227/pexels-photo-91227.jpeg?auto=compress&cs=tinysrgb&w=600&dpr=1',
+    },
+    {
+      name: 'Amelia Rose',
+      role: 'Resident',
+      quote: 'Beautifully maintained, secure, and truly luxurious living.',
+      avatar:
+        'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?auto=compress&cs=tinysrgb&w=600&dpr=1',
+    },
+  ];
+  const rail = useRef(null);
+  useEffect(() => {
+    const el = rail.current;
+    if (!el) return;
+    let i = 0;
+    const id = setInterval(() => {
+      i = (i + 1) % reviews.length;
+      const w = el.firstChild?.getBoundingClientRect().width || 340;
+      el.scrollTo({ left: i * (w + 16), behavior: 'smooth' });
+    }, 4200);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <div>
+      <div className="text-center max-w-3xl mx-auto mb-8">
+        <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Testimonials</p>
+        <h2 className="text-4xl font-bold text-primary">What Residents Say</h2>
+      </div>
+      <div ref={rail} className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1">
+        {reviews.map((r, idx) => (
+          <div key={idx} className="min-w-[340px] max-w-[340px] snap-start">
+            <div className="bg-base-100 p-6 rounded-xl shadow-md h-full">
+              <div className="flex items-center gap-4 mb-4">
+                <img src={r.avatar} alt={r.name} className="w-14 h-14 rounded-full object-cover border-2 border-accent" />
+                <div>
+                  <div className="font-semibold">{r.name}</div>
+                  <div className="text-sm text-base-content/60">{r.role}</div>
+                </div>
+              </div>
+              <p className="text-base-content/80">“{r.quote}”</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- FAQ (compact accordion) ---
+const FAQ = () => {
+  const items = [
+    { q: 'How do I request an apartment?', a: 'Browse apartments, submit an agreement request, and an admin will review it.' },
+    { q: 'Do you offer discounts?', a: 'Yes, admins manage coupons which apply at checkout for eligible members.' },
+    { q: 'Is there on-site parking?', a: 'Yes, limited reserved parking is available for members.' },
+    { q: 'Are pets allowed?', a: 'Pet-friendly units are available; terms apply.' },
+  ];
+  return (
+    <div>
+      <div className="text-center max-w-3xl mx-auto mb-8">
+        <p className="text-secondary font-semibold tracking-widest uppercase mb-2">FAQ</p>
+        <h2 className="text-4xl font-bold text-primary">Good to Know</h2>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {items.map((it, i) => (
+          <div key={i} className="collapse collapse-arrow border border-base-200 bg-base-100">
+            <input type="checkbox" />
+            <div className="collapse-title text-lg font-medium">{it.q}</div>
+            <div className="collapse-content text-base-content/70">
+              <p>{it.a}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// --- CTA ---
+const CTASection = () => (
+  <div className="rounded-2xl bg-gradient-to-r from-primary to-secondary text-white p-10 md:p-12 shadow-2xl text-center">
+    <h2 className="text-3xl md:text-4xl font-extrabold mb-3">Find Your Next Home at Nexus</h2>
+    <p className="opacity-90 mb-6">Discover curated apartments, flexible options, and member-first perks.</p>
+    <div className="flex justify-center gap-3">
+      <Link to="/apartment" className="btn btn-accent">Browse Apartments</Link>
+      <Link to="/login" className="btn btn-ghost text-white border-white/70 hover:bg-white hover:text-primary">Join Now</Link>
+    </div>
+  </div>
+);
+
+// --- Newsletter (refined) ---
+const Newsletter = () => (
+  <div className="rounded-2xl bg-base-100 border border-base-200 p-8 md:p-10">
+    <div className="text-center max-w-2xl mx-auto mb-6">
+      <h3 className="text-3xl font-bold text-primary">Stay Updated</h3>
+      <p className="text-base-content/70">Get the latest announcements and offers delivered to your inbox.</p>
+    </div>
+    <form className="flex flex-col sm:flex-row justify-center items-center gap-3 max-w-xl mx-auto">
+      <input type="email" placeholder="Enter your email" className="input input-bordered w-full" required />
+      <button type="submit" className="btn btn-secondary w-full sm:w-auto">Subscribe</button>
+    </form>
+  </div>
+);
+
+// --- Main Home ---
 function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
     <div>
       <Banner />
-      
-      <div className="container mx-auto px-4 py-16 sm:py-24">
-        
-        <section className="space-y-16">
-          <div className="text-center max-w-3xl mx-auto">
-            <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Building Features</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-              A Lifestyle, Not Just a Residence
-            </h2>
-            <p className="text-lg text-gray-600">
-              Discover a new standard of urban living where modern design,
-              exclusive amenities, and a prime location converge to create an
-              unparalleled lifestyle.
-            </p>
-          </div>
+      <Coupons isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
 
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="rounded-xl shadow-2xl overflow-hidden h-96">
-              <img
-                src="https://images.pexels.com/photos/323705/pexels-photo-323705.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                alt="Modern Architecture"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="text-left">
-              <h3 className="text-3xl font-bold text-secondary mb-3">
-                Innovative Design
-              </h3>
-              <p className="text-gray-600 text-xl leading-relaxed">
-                Designed with sleek, contemporary lines and eco-friendly materials, our building stands as a beacon of modern living. Every detail, from the floor-to-ceiling windows that flood each apartment with natural light to the sustainably sourced finishes, has been thoughtfully considered. Each space is meticulously crafted for unparalleled comfort, timeless style, and a commitment to sustainability.
-              </p>
-            </div>
-          </div>
+      <main className="container mx-auto px-4 space-y-16 md:space-y-20 my-16 md:my-20">
+        <AnimatedSection>
+          <StatsStrip />
+        </AnimatedSection>
 
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-center">
-            <div className="md:order-2 rounded-xl shadow-2xl overflow-hidden h-96">
-              <img
-                src="https://images.pexels.com/photos/259950/pexels-photo-259950.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                alt="Luxury Amenities"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="md:order-1 text-left">
-              <h3 className="text-3xl font-bold text-secondary mb-3">
-                Exclusive Amenities
-              </h3>
-              <p className="text-gray-600 text-xl leading-relaxed">
-                Enjoy access to a rooftop pool with panoramic city views, a state-of-the-art fitness center equipped with the latest technology, and serene resident lounges perfect for work or relaxation. Our exclusive co-working spaces are designed to enhance your productivity, while the landscaped gardens provide a tranquil escape from the urban energy.
-              </p>
-            </div>
-          </div>
-        </section>
+        <AnimatedSection>
+          <FeatureGrid />
+        </AnimatedSection>
 
-        
-        <section className="mt-24">
-          <div className="text-center max-w-3xl mx-auto mb-12">
-            <p className="text-secondary font-semibold tracking-widest uppercase mb-2">Our Location</p>
-            <h2 className="text-4xl md:text-5xl font-bold text-primary mb-4">
-              In the Heart of the City
-            </h2>
-          </div>
-          <div className="bg-base-200 rounded-2xl p-8 md:p-12">
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12 items-center">
-              <div className="lg:col-span-2 text-left">
-                <p className="text-lg text-gray-600 mb-6">
-                  Conveniently located with easy access to public transport,
-                  fine dining, and cultural landmarks. Everything you need is
-                  just moments away.
-                </p>
-                <p className="font-semibold text-secondary mb-2">
-                  123 Nexus Avenue, Urbanopolis, 12345
-                </p>
-                <a
-                  href="https://www.google.com/maps/search/?api=1&query=40.7128,-74.0060"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-accent text-base-100 hover:bg-accent-focus transition-colors mt-4"
-                >
-                  Explore the Neighborhood
-                </a>
-              </div>
-              <div className={`lg:col-span-3 h-80 md:h-[400px] rounded-xl overflow-hidden shadow-xl relative ${isModalOpen ? 'z-0' : 'z-10'}`}>
-                <MapContainer
-                  center={[40.7128, -74.006]}
-                  zoom={14}
-                  scrollWheelZoom={false}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <Marker position={[40.7128, -74.006]}>
-                    <Popup>
-                      Nexus Living <br /> 123 Nexus Avenue
-                    </Popup>
-                  </Marker>
-                </MapContainer>
-              </div>
-            </div>
-          </div>
-        </section>
+        <AnimatedSection>
+          <FeaturedApartments />
+        </AnimatedSection>
 
-        {/* Coupons Section */}
-        <Coupons isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
-      </div>
+        <AnimatedSection>
+          <AmenitiesMosaic />
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <LocationSection />
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <TestimonialsCarousel />
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <FAQ />
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <CTASection />
+        </AnimatedSection>
+
+        <AnimatedSection>
+          <Newsletter />
+        </AnimatedSection>
+      </main>
     </div>
   );
 }
