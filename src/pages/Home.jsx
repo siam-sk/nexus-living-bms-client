@@ -21,14 +21,16 @@ const useScrollAnimation = () => {
       }
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    const node = ref.current;
+    if (node) {
+      observer.observe(node);
     }
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (node) {
+        observer.unobserve(node);
       }
+      observer.disconnect();
     };
   }, []);
 
@@ -429,7 +431,7 @@ const FeaturedApartments = () => {
       rail.scrollTo({ left: i * (cardWidth + 16), behavior: 'smooth' });
     }, 3500);
     return () => clearInterval(id);
-  }, []);
+  }, [apartments.length]);
 
   return (
     <div>
@@ -581,7 +583,7 @@ const TestimonialsCarousel = () => {
       el.scrollTo({ left: i * (w + 16), behavior: 'smooth' });
     }, 4200);
     return () => clearInterval(id);
-  }, []);
+  }, [reviews.length]);
   return (
     <div>
       <div className="text-center max-w-3xl mx-auto mb-8">
